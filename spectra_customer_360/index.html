@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>Спектра · CX-платформа СИБУР</title>
+<style>
+/* =========================================================================
+   ДИЗАЙН-ТОКЕНЫ. Только системные шрифты, никаких внешних подключений.
+   ========================================================================= */
+:root{
+  /* Палитра приведена к фактическому фирменному цвету СИБУРа — синему/
+     цвету морской волны (см. sibur-holding/logo: «#55b4c7»). Зелёно-
+     оранжевая версия была ошибочной и заменена целиком. Условные цвета
+     NPS-сегментов (детрактор/нейтрал/промоутер) остаются отдельной,
+     функциональной шкалой — это данные, а не брендинг, их нельзя путать
+     с оценкой "хорошо/плохо" по смыслу цвета. */
+  --bg:#F1F7F8; --surface:#FFFFFF; --surface-2:#E7F3F5;
+  --nav-bg:#123B47; --nav-bg-2:#164F5E; --nav-text:#AEDCE6; --nav-text-active:#FFFFFF;
+  --accent:#2FA8C7; --accent-dark:#146B80; --accent-soft:#E1F3F7;
+  --brand-navy:#123B47; --brand-navy-2:#1D6E85; --brand-blue:#55B4C7; --brand-blue-soft:#E1F3F7;
+  --ink:#0F1B1F; --ink-soft:#47585C; --ink-faint:#6C8A91;
+  --border:#D5E6E9; --border-strong:#B7D8DE;
+  --green:#1E9D63; --green-soft:#E4F7ED;
+  --yellow:#B9820E; --yellow-soft:#FBF1D8;
+  --red:#D2445A; --red-soft:#FBE7EB;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","Segoe UI Mono","SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  --radius:10px; --shadow:0 1px 2px rgba(11,59,46,.06),0 1px 8px rgba(11,59,46,.05);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;min-width:1280px;}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:13px;line-height:1.5;}
+h1,h2,h3,h4{margin:0;font-weight:600;}
+p{margin:0;}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;}
+button,select,input{font-family:var(--font);}
+a{color:inherit;}
+svg text{font-family:var(--mono);}
+
+.app{display:flex;min-height:100vh;}
+.sidebar{width:230px;flex-shrink:0;background:var(--nav-bg);color:var(--nav-text);display:flex;flex-direction:column;padding:18px 12px;position:sticky;top:0;height:100vh;}
+.sidebar-brand{display:flex;align-items:center;gap:9px;padding:6px 10px 20px;}
+.sidebar-brand .mark{width:26px;height:26px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;}
+.sidebar-brand .name{color:#fff;font-weight:700;font-size:15px;letter-spacing:.01em;}
+.sidebar-nav{display:flex;flex-direction:column;gap:2px;flex:1;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;cursor:pointer;font-size:12.5px;color:var(--nav-text);transition:background .12s;}
+.nav-item svg{flex-shrink:0;opacity:.85;}
+.nav-item:hover{background:var(--nav-bg-2);color:#fff;}
+.nav-item.active{background:var(--accent);color:#fff;}
+.nav-item.active svg{opacity:1;}
+.sidebar-foot{padding:10px;margin-top:10px;border-top:1px solid rgba(255,255,255,.08);}
+.sidebar-foot .tag{font-family:var(--mono);font-size:10.5px;color:var(--nav-text);}
+.main-wrap{flex:1;min-width:0;display:flex;flex-direction:column;}
+
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:20;}
+.topbar .company{font-weight:700;font-size:13.5px;margin-right:6px;}
+.topbar input[type=text]{border:1px solid var(--border-strong);border-radius:7px;padding:6px 10px;font-size:12px;width:190px;background:var(--surface-2);}
+.topbar select{border:1px solid var(--border-strong);border-radius:7px;padding:6px 9px;font-size:12px;background:var(--surface);color:var(--ink);cursor:pointer;}
+.topbar .btn-reset{border:1px solid var(--border-strong);background:var(--surface);border-radius:7px;padding:6px 12px;font-size:12px;cursor:pointer;color:var(--ink-soft);}
+.topbar .btn-reset:hover{background:var(--surface-2);}
+.samplesize{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink-faint);white-space:nowrap;}
+.importdate{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);white-space:nowrap;}
+#main-content{padding:22px 24px 48px;max-width:1520px;}
+
+.grid{display:grid;gap:14px;}
+.grid-2{grid-template-columns:1fr 1fr;} .grid-3{grid-template-columns:1fr 1fr 1fr;} .grid-4{grid-template-columns:repeat(4,1fr);}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;}
+.card-title{font-size:12.5px;font-weight:600;}
+.card-sub{font-size:11px;color:var(--ink-faint);margin-top:2px;margin-bottom:10px;}
+.section-title{font-size:15px;font-weight:700;margin:22px 0 12px;}
+.section-title:first-child{margin-top:0;}
+
+.kpi .num{display:block;font-size:22px;font-weight:600;}
+.kpi .kpi-label{font-size:11px;color:var(--ink-soft);margin-top:4px;}
+.kpi .kpi-n{font-family:var(--mono);font-size:10px;color:var(--ink-faint);}
+.kpi .kpi-delta{display:inline-block;margin-top:6px;font-family:var(--mono);font-size:10.5px;padding:2px 7px;border-radius:16px;}
+.d-up{background:var(--green-soft);color:var(--green);} .d-down{background:var(--red-soft);color:var(--red);} .d-flat{background:var(--surface-2);color:var(--ink-soft);}
+.kpi{cursor:pointer;} .kpi:hover{border-color:var(--accent);}
+.chart-box{position:relative;min-height:210px;}
+.chart-err{border:1px dashed var(--border-strong);border-radius:8px;padding:16px;color:var(--ink-faint);font-size:11.5px;text-align:center;}
+
+.tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;padding:3px 8px;border-radius:14px;}
+.tag-real{background:var(--accent-soft);color:var(--accent-dark);} .tag-real::before{content:'●';font-size:8px;}
+.tag-empty{background:var(--surface-2);color:var(--ink-faint);border:1px dashed var(--border-strong);} .tag-empty::before{content:'○';font-size:8px;}
+.tag-warn{background:var(--yellow-soft);color:var(--yellow);}
+.tag-mock{background:var(--surface-2);color:var(--ink-faint);border:1px dashed var(--border-strong);margin-top:8px;display:inline-block;}
+.mock-frame{background:var(--surface-2);border:1px dashed var(--border-strong);border-radius:8px;padding:6px 4px;margin:10px 0 4px;opacity:.9;}
+.pill{display:inline-block;padding:3px 9px;border-radius:14px;font-size:10.5px;font-family:var(--mono);white-space:nowrap;}
+.pill-promoter{background:var(--green-soft);color:var(--green);} .pill-passive{background:var(--yellow-soft);color:var(--yellow);} .pill-detractor{background:var(--red-soft);color:var(--red);}
+
+table.dt{width:100%;border-collapse:collapse;font-size:12px;}
+table.dt th{text-align:left;font-weight:600;color:var(--ink-soft);font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;padding:8px 9px;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;}
+table.dt th:hover{color:var(--accent);}
+table.dt th.sorted::after{content:' ▾';} table.dt th.sorted-asc::after{content:' ▴';}
+table.dt td{padding:8px 9px;border-bottom:1px solid var(--border);vertical-align:top;}
+table.dt tr:hover td{background:var(--surface-2);}
+table.dt tr.clickable{cursor:pointer;}
+.table-toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;}
+.table-toolbar input[type=text]{border:1px solid var(--border-strong);border-radius:7px;padding:6px 10px;font-size:12px;width:220px;}
+.btn{border:1px solid var(--border-strong);background:var(--surface);border-radius:7px;padding:6px 12px;font-size:11.5px;cursor:pointer;color:var(--ink);}
+.btn:hover{background:var(--surface-2);}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);} .btn.primary:hover{background:var(--accent-dark);}
+.chip-toggle{display:inline-flex;background:var(--surface-2);border-radius:7px;padding:2px;}
+.chip-toggle button{border:none;background:transparent;padding:5px 11px;border-radius:5px;font-size:11.5px;cursor:pointer;color:var(--ink-soft);}
+.chip-toggle button.active{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);}
+.preset-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.preset-btn{border:1px solid var(--border-strong);background:var(--surface);border-radius:16px;padding:5px 12px;font-size:11px;cursor:pointer;}
+.preset-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.pagination{display:flex;align-items:center;gap:10px;padding:10px 9px;font-size:11.5px;color:var(--ink-soft);}
+.pagination button{border:1px solid var(--border-strong);background:var(--surface);border-radius:6px;padding:4px 10px;cursor:pointer;}
+.pagination button:disabled{opacity:.4;cursor:not-allowed;}
+
+.empty-state{border:1px dashed var(--border-strong);border-radius:10px;padding:20px 22px;background:repeating-linear-gradient(135deg, var(--surface-2) 0 8px, transparent 8px 16px);}
+.empty-state h4{font-size:12.5px;margin-bottom:5px;} .empty-state p{font-size:11.5px;color:var(--ink-soft);line-height:1.55;margin-bottom:10px;}
+.btn-disabled{border:1px solid var(--border-strong);background:var(--surface-2);color:var(--ink-faint);border-radius:7px;padding:6px 13px;font-size:11.5px;cursor:not-allowed;}
+
+.tabs{display:inline-flex;gap:3px;background:var(--surface-2);padding:3px;border-radius:8px;margin-bottom:14px;}
+.tabs button{border:none;background:transparent;padding:7px 14px;border-radius:6px;font-size:12px;cursor:pointer;color:var(--ink-soft);}
+.tabs button.active{background:var(--surface);color:var(--ink);box-shadow:var(--shadow);}
+
+.comment-row{border-bottom:1px solid var(--border);padding:12px 2px;}
+.comment-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:5px;}
+.comment-meta{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);}
+.comment-text{font-size:12.5px;color:var(--ink);font-style:italic;line-height:1.5;}
+
+table.heat{border-collapse:collapse;font-size:11px;}
+table.heat th{padding:6px 8px;font-size:10px;color:var(--ink-soft);text-align:left;}
+table.heat td{padding:0;text-align:center;}
+.heat-cell{width:64px;height:34px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;}
+.heat-na{background:repeating-linear-gradient(135deg, var(--surface-2) 0 5px, transparent 5px 10px);color:var(--ink-faint);}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(15,17,35,.45);display:none;align-items:flex-start;justify-content:center;padding:60px 20px;z-index:100;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:var(--surface);border-radius:12px;max-width:900px;width:100%;max-height:75vh;overflow:auto;padding:20px 22px;box-shadow:0 12px 40px rgba(0,0,0,.25);}
+.modal-box .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.modal-close{border:none;background:var(--surface-2);border-radius:7px;width:26px;height:26px;cursor:pointer;font-size:14px;}
+#toast-container{position:fixed;bottom:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px;}
+.toast{background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:12px;box-shadow:0 6px 20px rgba(0,0,0,.2);}
+.toast.err{background:var(--red);}
+
+.integrity-strip{display:flex;gap:22px;flex-wrap:wrap;align-items:center;background:var(--brand-blue-soft);color:var(--brand-navy-2);border-radius:10px;padding:11px 16px;font-size:11.5px;margin-bottom:16px;}
+.hero-brand{
+  background:linear-gradient(115deg, var(--brand-navy) 0%, var(--brand-navy-2) 62%, #1D6E85 100%);
+  color:#E3F6FA;border-radius:14px;padding:22px 26px;margin-bottom:16px;
+  display:grid;grid-template-columns:1.35fr 1fr;gap:24px;align-items:center;position:relative;overflow:hidden;
+}
+.hero-brand::after{content:'';position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:40%;background:rgba(143,227,192,.16);transform:rotate(18deg);}
+.hero-brand .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-blue);margin-bottom:8px;}
+.hero-brand h1{font-size:20px;font-weight:600;line-height:1.4;color:#fff;max-width:62ch;position:relative;}
+.hero-brand h1 .num{color:var(--accent);font-weight:700;}
+.hero-brand .hero-caveat{font-size:11px;color:#BFE3EC;margin-top:10px;max-width:56ch;line-height:1.5;}
+.hero-side{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:14px 16px;position:relative;}
+.hero-side .card-title{color:#fff;}
+.insight-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;}
+.insight-list li{font-size:12px;line-height:1.55;padding-left:16px;position:relative;color:#EAF6F9;}
+.insight-list li::before{content:'▸';position:absolute;left:0;color:var(--accent);font-weight:700;}
+.risk-item{display:grid;grid-template-columns:80px 1fr 90px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);}
+.risk-item:last-child{border-bottom:none;}
+.risk-bar-track{height:7px;background:var(--surface-2);border-radius:4px;overflow:hidden;}
+.risk-bar-fill{height:100%;border-radius:4px;}
+.risk-score-high{color:var(--red);} .risk-score-mid{color:var(--yellow);} .risk-score-low{color:var(--green);}
+.warn-badge{background:var(--yellow-soft);color:var(--yellow);border-radius:6px;padding:5px 9px;font-size:11px;display:inline-block;}
+.small-muted{font-size:11px;color:var(--ink-faint);}
+.driver-block{border-bottom:1px solid var(--border);padding:16px 0;}
+.driver-block:first-child{padding-top:0;} .driver-block:last-child{border-bottom:none;}
+.mini-hist{display:flex;align-items:flex-end;gap:4px;height:44px;}
+.mini-hist .bar{flex:1;background:var(--accent);border-radius:2px 2px 0 0;}
+.legend-dot{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-soft);}
+.legend-dot::before{content:'●';font-size:9px;}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <nav class="sidebar">
+    <div class="sidebar-brand"><span class="mark">S</span><span class="name">Спектра</span></div>
+    <div class="sidebar-nav" id="sidebarNav"></div>
+    <div class="sidebar-foot"><div class="tag">СИБУР · пилот 2025–2026</div></div>
+  </nav>
+  <div class="main-wrap">
+    <div class="topbar" id="topbar"></div>
+    <div id="main-content"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-head"><h3 id="modalTitle">—</h3><button class="modal-close" data-action="modal-close">✕</button></div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+<div id="toast-container"></div>
+
+<script>
+'use strict';
+/* =========================================================================
+   СЕКЦИЯ 1. ИСХОДНЫЕ ДАННЫЕ
+   Единственный источник фактов — выгрузка Excel (листы «2025» и «2026»),
+   встроена ниже как JS-объект. Файл полностью автономен: после генерации
+   Excel больше не читается и не требуется рядом с HTML.
+   Пустая ячейка => null. Текстовые ответы ("Не обращался", "Не могу
+   оценить", "Did not apply") сохранены как текст и не участвуют в
+   числовых расчётах (см. СЕКЦИЯ 3, isNum()).
+   ========================================================================= */
+const RAW_DATA_SOURCE = [{"year": 2025, "id": 111111, "country": "РФ", "tier": "B", "industry": "Инженерная и Дорожная инфраструктура", "sat": 2, "satComment": null, "manager": 1, "managerComment": "Нет ответов", "orderSupport": 4, "orderSupportComment": null, "documents": 4, "documentsComment": null, "volume": 4, "volumeComment": null, "quality": 2, "qualityComment": null, "price": 2, "priceComment": null, "paymentTerms": 1, "paymentTermsComment": null, "cpSpeed": 1, "cpSpeedComment": null, "logistics": 4, "logisticsComment": null, "packaging": 4, "packagingComment": null, "techService": 4, "techServiceComment": null, "webConvenience": 1, "webConvenienceComment": null, "partnershipDevelop": 2, "partnershipPromote": 1, "partnershipUnderstandMarket": 1, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 1, "npsComment": "Монополия"}, {"year": 2025, "id": 111112, "country": "РФ", "tier": "D", "industry": "Электронная коммерция и партнерства", "sat": 1, "satComment": "В октябре месяце по заявке на изобутиловый спирт не получен ответ и не произведена отгрузка, при этом цена постоянно изменялась.", "manager": 2, "managerComment": "Менеджер не мог точно и конкретно обозначить цену и условия отгрузки", "orderSupport": 2, "orderSupportComment": null, "documents": 2, "documentsComment": null, "volume": 1, "volumeComment": "Заранее подавалась заявка, в результате чего ее не согласовали за длительный срок и не отгрузили объем.", "quality": 1, "qualityComment": "нет", "price": 1, "priceComment": "Цена со слов менеджера изменялась несколько раз, при этом после объявления окончательной цены отгрузка так и не произведена", "paymentTerms": 1, "paymentTermsComment": null, "cpSpeed": 1, "cpSpeedComment": null, "logistics": 1, "logisticsComment": null, "packaging": 1, "packagingComment": null, "techService": "Не обращался", "techServiceComment": null, "webConvenience": 1, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": 1, "partnershipHelpsGrow": 1, "partnershipComment": "СИБУР оставил заявку без внимания и не произвел отгрузку", "nps": 1, "npsComment": "Потому что не получилось делового партнерства с данной организацией"}, {"year": 2025, "id": 111113, "country": "РФ", "tier": "C", "industry": "Гибкая упаковка", "sat": 3, "satComment": "Постоянные перебои с нужными марками без предупреждений", "manager": 4, "managerComment": "не всегда было все быстро, сейчас ситуация изменилась", "orderSupport": 3, "orderSupportComment": "с опозданием все рассматривается, пришло уведомление о компенсации потерь, но компенсации так и не было", "documents": 4, "documentsComment": "не всегда все быстро", "volume": 1, "volumeComment": "с объемами постоянные перебои", "quality": 3, "qualityComment": "бывают нарекания по качеству", "price": 4, "priceComment": null, "paymentTerms": 4, "paymentTermsComment": "Рассмотрение условий оплаты по факту отгрузки продукции.", "cpSpeed": 4, "cpSpeedComment": null, "logistics": 3, "logisticsComment": "очень долго машины стоят на загрузках", "packaging": 3, "packagingComment": "не всегда приходят целые мешки, очень долго машины стоят на загрузках", "techService": 3, "techServiceComment": "все долго и бесполезно", "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": 3, "partnershipPromote": 3, "partnershipUnderstandMarket": 3, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 3, "npsComment": "постоянные перебои с объемами"}, {"year": 2025, "id": 111114, "country": "РФ", "tier": "B", "industry": "Электронная коммерция и партнерства", "sat": 1, "satComment": "не сделаем россию великой", "manager": 5, "managerComment": null, "orderSupport": 5, "orderSupportComment": null, "documents": 3, "documentsComment": "электронный кабинет иногда вымораживает", "volume": 3, "volumeComment": "иногда не везет", "quality": 3, "qualityComment": "по всякому", "price": 1, "priceComment": "дороже всех, классовая ненависть у потребителей", "paymentTerms": 4, "paymentTermsComment": null, "cpSpeed": 4, "cpSpeedComment": null, "logistics": 4, "logisticsComment": null, "packaging": 4, "packagingComment": null, "techService": 3, "techServiceComment": null, "webConvenience": 3, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": 3, "partnershipHelpsGrow": 1, "partnershipComment": null, "nps": 3, "npsComment": "не доволен ценовой политикой компании"}, {"year": 2025, "id": 111115, "country": "РФ", "tier": "C", "industry": "Транспорт", "sat": 3, "satComment": "Сложное взаимодействие в случае возникновения критики по отгрузкам. Нет точного понимания , когда поставщик планирует свое пр-во и будем ли обеспчены гранулятам тогда , когда размещаем заказ.", "manager": 4, "managerComment": "напрямую менеджер никаких решений не принимает", "orderSupport": 3, "orderSupportComment": "ожидание подтверждение заказ 2-3 дня по почте, напрямую менеджер не отвечает, долго в системе все происходит. На мой взгляд - бюрократия", "documents": 4, "documentsComment": null, "volume": 3, "volumeComment": "были проблемы с обеспечением", "quality": 2, "qualityComment": "материал изменяется от партии к партии, не стабильный процесс пр-ва", "price": 4, "priceComment": null, "paymentTerms": 4, "paymentTermsComment": null, "cpSpeed": 4, "cpSpeedComment": null, "logistics": "нет оценки", "logisticsComment": null, "packaging": "нет оценки", "packagingComment": null, "techService": "Не обращался", "techServiceComment": null, "webConvenience": 4, "webConvenienceComment": "заказы оформляются, но для меня это не удобно. нельзя направить прогноз, изменить его, статус отгрузки формируется не корректно. ДЛЯ ПОЛЬЗОВАТЕЛЯ СЕРВИС НЕ ПРОРАБОТАН!", "partnershipDevelop": 3, "partnershipPromote": 1, "partnershipUnderstandMarket": 2, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 4, "npsComment": "качество продукции и малый ассортимент для потребностей нашей компании. Цена высокая - дешевле и качетсвеннее привести из Китая"}, {"year": 2025, "id": 111116, "country": "РФ", "tier": "B", "industry": "Электронная коммерция и партнерства", "sat": 3, "satComment": "Медленное принятие решений и оформление документов", "manager": 4, "managerComment": "Уточнение по наличию сырья происходит в течении 3-х суток", "orderSupport": 3, "orderSupportComment": "Мало взаимодействия, претензии к транспорту", "documents": 3, "documentsComment": "оформление документов производится медленно", "volume": 3, "volumeComment": "Подтверждение объемов не всегда возможно, касается группы Сэвилен", "quality": 5, "qualityComment": null, "price": 4, "priceComment": null, "paymentTerms": 4, "paymentTermsComment": null, "cpSpeed": 4, "cpSpeedComment": null, "logistics": 1, "logisticsComment": "Слишком дорого", "packaging": 1, "packagingComment": null, "techService": "Не обращался", "techServiceComment": null, "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": 3, "partnershipHelpsGrow": 3, "partnershipComment": null, "nps": 4, "npsComment": "Непрерывно сыплющиеся претензии от Претензионного центра, относящиеся к работе транспортных компаний доставляющих сырье от Сибура."}, {"year": 2025, "id": 111117, "country": "РФ", "tier": "C", "industry": "Электронная коммерция и партнерства", "sat": 1, "satComment": "Невозможно связаться с менеджерами. Можно месяцами ждать ответа на свои вопросы и так и не дождаться", "manager": 1, "managerComment": "7 апреля я задала вопрос и несмотря на несколько напоминаний так и не получила никакого ответа. Просто игнорируют", "orderSupport": 1, "orderSupportComment": "Аналогично, отсутствие ответов.", "documents": 2, "documentsComment": "Счет приходится ждать несколько дней. Нет уведомления о том, что он сформирован, приходится заходить в ЛК и проверять", "volume": 5, "volumeComment": "Всё, что заказываем, обычно получаем.", "quality": 4, "qualityComment": null, "price": 4, "priceComment": null, "paymentTerms": 3, "paymentTermsComment": null, "cpSpeed": 1, "cpSpeedComment": null, "logistics": 5, "logisticsComment": "Логистика молодцы, они работают быстро.", "packaging": 5, "packagingComment": null, "techService": "Не обращался", "techServiceComment": null, "webConvenience": 1, "webConvenienceComment": "Это кошмар каждый раз. Отгрузка идет кратно паллетам, но ты не знаешь сколько вмещается, и как менеджер исправит счет. Невозможно самостоятельно изменить количество, если делаешь заказ копированием", "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": 1, "partnershipHelpsGrow": 3, "partnershipComment": "Сибур пользуется тем, что у них нет конкурентов. Если бы кто-то еще предлагал такую продукцию по сходным ценам, Сибур не позволил бы свои менеджерам такое высокомерие.", "nps": 5, "npsComment": "Если кто-то спросит, я бы ответила. Но рекомендовать бы не стала."}, {"year": 2025, "id": 111118, "country": "РФ", "tier": "C", "industry": "Гибкая упаковка", "sat": 4, "satComment": null, "manager": 4, "managerComment": "Оперативность", "orderSupport": 4, "orderSupportComment": "Все хорошо", "documents": 2, "documentsComment": "Очень сложный процесс оформления заказа в ЛК", "volume": 3, "volumeComment": "Отсутствие 30200", "quality": 4, "qualityComment": "Ок", "price": 3, "priceComment": null, "paymentTerms": 3, "paymentTermsComment": null, "cpSpeed": 3, "cpSpeedComment": null, "logistics": 2, "logisticsComment": "Выбранный в ЛК склад не совпадает с итоговым", "packaging": 2, "packagingComment": null, "techService": "Не обращался", "techServiceComment": null, "webConvenience": 2, "webConvenienceComment": "долго", "partnershipDevelop": 3, "partnershipPromote": 3, "partnershipUnderstandMarket": 3, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 5, "npsComment": "цены по многим продуктам выше рынка, но широкий ассортимент"}, {"year": 2025, "id": 111119, "country": "РФ", "tier": "A", "industry": "Жесткая упаковка", "sat": 2, "satComment": "Некоторые сотрудники не компетентны, не заинтересованы в решении вопросов клиентов, часто не получаем ответ на свои вопросы, при случаи форс мажоров никто в курс дела клиента не ставит, самовольно передвигают поставки сырья или отменяют их, на встречу по некоторым вопросам отгрузки никто идти не хочет и т.д.", "manager": 1, "managerComment": "Некоторые сотрудники не компетентны, не заинтересованы в решении вопросов клиентов, часто не получаем ответ на свои вопросы, при случаи форс мажоров никто в курс дела клиента не ставит, самовольно передвигают поставки сырья или отменяют их, на встречу по некоторым вопросам отгрузки никто идти не хочет и т.д. Менеджер в решение вопросов не подключается, не имеет заинтересованности и клиентоориентированности.", "orderSupport": 3, "orderSupportComment": "Часто приезжает машина с некорректными сопроводительными документами, сотрудники долго решают вопрос.\nЧасто ставят в график машины как им удобно, а не как оформлено в заказе в Личном кабинете. Часто игнорируют вопросы по вопросу взаимозачетов и всего того, что касается будущих поставок. Часто пишем уведомление по качеству поставки товара, товар упакован в ненадлежащем виде, хотя не раз просили решить данный вопрос.", "documents": 2, "documentsComment": "Долго выставляются документы в ЭДО, несвоевременно.\nЗаказ в ЛК оформлен, цена согласована, а документы приходится ждать по 5-7 дней. Потом получается, что документ был оформлен со стороны Сибур не корректно и после нашего внутреннего согласования, по просьбе Сибура отклоняем в ЭДО документ и ждем пока вышлют корректный,что занимает еще определенное время.", "volume": 3, "volumeComment": "в личном кабинете указываем один объем, а Доп.соглашение делают на другой(меньше) и, соответственно, отгружают меньше  в течение месяца\nПросим за месяц забронировать для нашей компании определенное сырье, в итоге оказывается, что его опять нет в полном объёме", "quality": 4, "qualityComment": "Полиэтилен \"газит\" очень", "price": 1, "priceComment": null, "paymentTerms": 1, "paymentTermsComment": null, "cpSpeed": 1, "cpSpeedComment": null, "logistics": 1, "logisticsComment": "сроки поставки не соблюдаются всегда.\nтовар приходит в несоответствующем виде(упаковка) Мешки на поддоне в разные стороны свисают, за пределы поддона выходят, часто мешки порванные приходят, а поддоны из пластмассы вовсе гнутся и ломаются, что в свою очередь добавляет доп. трудозатраты и время на кладовщиков.", "packaging": 1, "packagingComment": "сроки поставки не соблюдаются всегда.\nтовар приходит в несоответствующем виде(упаковка) Мешки на поддоне в разные стороны свисают, за пределы поддона выходят, часто мешки порванные приходят, а поддоны из пластмассы вовсе гнутся и ломаются, что в свою очередь добавляет доп. трудозатраты и время на кладовщиков.", "techService": 3, "techServiceComment": "Больше 2х лет просим сделать такой ПЭ, который бы не \"газил\" и подходил для выдува как большой тары (3л), так и для маленькой (0,45л). За 2 года продвижений в данном вопросе нет. Были образцы предоставлены других ПЭ, но результат отрицательный.", "webConvenience": 4, "webConvenienceComment": "В целом все хорошо, но есть нюансы.\nна сайте мы ставим график поставок к нам на склад, а сотрудники Сибура ставят только еще отгрузку машин в эти дни, т.е. у нас идет уже отклонение от нашего графика, в нашем случае это очень критично.", "partnershipDevelop": 1, "partnershipPromote": 2, "partnershipUnderstandMarket": 2, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 6, "npsComment": "Есть на рынке компании, которые могут предоставить товар по сервису и качеству лучше."}, {"year": 2025, "id": 111120, "country": "РФ", "tier": "C", "industry": "Инженерная и Дорожная инфраструктура", "sat": 4, "satComment": null, "manager": 4, "managerComment": "Затягиваются решения по возникающим вопросам.", "orderSupport": 4, "orderSupportComment": "Нарушается график отгрузок", "documents": 3, "documentsComment": "Приходится порой долго ждать оформленных документов", "volume": 4, "volumeComment": "Отсутствуют инновации полимера для модификации битума. около 2 лет презентуют на конференциях продукт который так и не запустили", "quality": 4, "qualityComment": "Стабильный в рамках разумного. частое слеживание продукта.", "price": 3, "priceComment": null, "paymentTerms": 3, "paymentTermsComment": null, "cpSpeed": 3, "cpSpeedComment": null, "logistics": 2, "logisticsComment": "Сбои графика отгрузки", "packaging": 2, "packagingComment": "Сбои графика отгрузки", "techService": "Не обращался", "techServiceComment": null, "webConvenience": 3, "webConvenienceComment": "Сайт вечно висит. в заказ не вернуться для просмотра графика отгрузки", "partnershipDevelop": 2, "partnershipPromote": 3, "partnershipUnderstandMarket": 1, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 6, "npsComment": "Существуют более стабильные продукты по доступным ценам"}, {"year": 2025, "id": 111121, "country": "РФ", "tier": "A", "industry": "Гибкая упаковка", "sat": 3, "satComment": null, "manager": 4, "managerComment": "Не всегда оперативно выходит на связь", "orderSupport": 4, "orderSupportComment": "Не всегда оперативно выходит на связь", "documents": 4, "documentsComment": "Длительный срок оформления документов", "volume": 4, "volumeComment": "Информация по материалам и объемам к отгрузке на следующий месяц мы получаем с опозданием, с задержкой до недели.", "quality": 4, "qualityComment": "Качество сырья и упаковки не всегда соответствуют заявленным требованиям.", "price": 5, "priceComment": null, "paymentTerms": 5, "paymentTermsComment": null, "cpSpeed": 5, "cpSpeedComment": null, "logistics": 4, "logisticsComment": null, "packaging": 4, "packagingComment": "Не всегда идет заводская упаковка паллет. Есть задержки по транспорту.", "techService": 5, "techServiceComment": null, "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": 3, "partnershipPromote": 5, "partnershipUnderstandMarket": 3, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 7, "npsComment": "Не удовлетворяет все наши потребности."}, {"year": 2025, "id": 111122, "country": "РФ", "tier": "B", "industry": "Медицина", "sat": 5, "satComment": null, "manager": 5, "managerComment": null, "orderSupport": 5, "orderSupportComment": null, "documents": 5, "documentsComment": null, "volume": 4, "volumeComment": "Часть гранул приходиться закупать в Китае.", "quality": 4, "qualityComment": "Была партия РР 350/FF3 с большим содержанием парафина.", "price": 5, "priceComment": null, "paymentTerms": 5, "paymentTermsComment": null, "cpSpeed": 5, "cpSpeedComment": null, "logistics": 5, "logisticsComment": null, "packaging": 5, "packagingComment": null, "techService": "Не обращался", "techServiceComment": null, "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": 5, "partnershipPromote": 3, "partnershipUnderstandMarket": 3, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 7, "npsComment": "Есть куда расти."}, {"year": 2025, "id": 111123, "country": "РФ", "tier": "A", "industry": "Медицина", "sat": 4, "satComment": null, "manager": 5, "managerComment": null, "orderSupport": 4, "orderSupportComment": "оперативно получаем ответа на вопросы", "documents": 3, "documentsComment": "в последнее время не получаем все необходимые документы перед отправкой машина, приходится запрашивать заново по почте", "volume": 5, "volumeComment": null, "quality": 5, "qualityComment": null, "price": 4, "priceComment": null, "paymentTerms": 4, "paymentTermsComment": null, "cpSpeed": 4, "cpSpeedComment": null, "logistics": 4, "logisticsComment": "В целом хорошее впечатление работы с Сибуром, но в последнее время все больше и больше вопросов по документации", "packaging": 4, "packagingComment": "В целом хорошее впечатление работы с Сибуром, но в последнее время все больше и больше вопросов по документации", "techService": 5, "techServiceComment": null, "webConvenience": "Не оформлял заказ через Интернет-магазин", "webConvenienceComment": null, "partnershipDevelop": 4, "partnershipPromote": 5, "partnershipUnderstandMarket": 4, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 8, "npsComment": "Оперативно выполняют задачи, удобное местоположение для логистики, нету проблем по качеству"}, {"year": 2025, "id": 111124, "country": "РФ", "tier": "C", "industry": "Медицина", "sat": 4, "satComment": "По платежам с банками, могут возникать нюансы по санкциям", "manager": 5, "managerComment": "Всегда на связи и ответит вовремя", "orderSupport": 5, "orderSupportComment": "Всегда есть обратная связь", "documents": 4, "documentsComment": "не всегда быстро", "volume": 5, "volumeComment": null, "quality": 4, "qualityComment": "не все продукты по качеству соответствуют иностранным аналогам", "price": 4, "priceComment": "иногда бывает высокая", "paymentTerms": 4, "paymentTermsComment": "вопрос отсрочки платежа", "cpSpeed": 5, "cpSpeedComment": null, "logistics": 5, "logisticsComment": null, "packaging": 5, "packagingComment": null, "techService": "Не обращался", "techServiceComment": null, "webConvenience": "Не оформлял заказ через Интернет-магазин", "webConvenienceComment": null, "partnershipDevelop": 4, "partnershipPromote": 3, "partnershipUnderstandMarket": 3, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 8, "npsComment": "Остаются вопросы по ассортименту, оплате, качеству продуктов"}, {"year": 2025, "id": 111125, "country": "РФ", "tier": "A", "industry": "НефтеГазопереработка и Добыча", "sat": 4, "satComment": "Уже больше 3 лет нет ЭДО", "manager": 5, "managerComment": "Все отлично!", "orderSupport": 5, "orderSupportComment": "Все отлично!", "documents": 4, "documentsComment": "Нет электронного документооборота", "volume": 5, "volumeComment": null, "quality": 5, "qualityComment": null, "price": 5, "priceComment": null, "paymentTerms": 4, "paymentTermsComment": null, "cpSpeed": 5, "cpSpeedComment": null, "logistics": 5, "logisticsComment": null, "packaging": 5, "packagingComment": null, "techService": "Не обращался", "techServiceComment": null, "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": 5, "partnershipPromote": 5, "partnershipUnderstandMarket": 5, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 9, "npsComment": "Такая крупная компания за за столько лет работы, должна уже настроить электронный документооборот! Никто не слышит обращений."}, {"year": 2025, "id": 111126, "country": "РФ", "tier": "B", "industry": "Инженерная и Дорожная инфраструктура", "sat": 3, "satComment": "Есть минусы в работе: несвоевременные поставки, качество продукции не всегда хорошее", "manager": 4, "managerComment": "не всегда менеджер на связи, нет поддержки в выходные дни", "orderSupport": 5, "orderSupportComment": null, "documents": 5, "documentsComment": null, "volume": 4, "volumeComment": "не всегда выполнялись поставки по заявленному объему", "quality": 4, "qualityComment": "были выявлены отклонения от ПТР по трубной марке", "price": 5, "priceComment": "см. самый первый комментарий", "paymentTerms": 5, "paymentTermsComment": "см. самый первый комментарий", "cpSpeed": 5, "cpSpeedComment": "см. самый первый комментарий", "logistics": 4, "logisticsComment": "сроки поставки не всегда выполняются", "packaging": 4, "packagingComment": "сроки поставки не всегда выполняются", "techService": 5, "techServiceComment": null, "webConvenience": "Не оформлял заказ через Интернет-магазин", "webConvenienceComment": null, "partnershipDevelop": 5, "partnershipPromote": 5, "partnershipUnderstandMarket": 4, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 9, "npsComment": "качество продукции пока не доходит до импортных аналогов, но зато стабильность наличия и поставок\nиногда цена у импортных аналогов ниже спот СИБУР"}, {"year": 2025, "id": 111127, "country": "РФ", "tier": "A", "industry": "Транспорт", "sat": 5, "satComment": "Сотрудничество с СИБУР дает уверенность в завтрашнем дне.", "manager": 5, "managerComment": null, "orderSupport": 5, "orderSupportComment": null, "documents": 5, "documentsComment": null, "volume": 5, "volumeComment": null, "quality": 5, "qualityComment": null, "price": 5, "priceComment": null, "paymentTerms": 5, "paymentTermsComment": null, "cpSpeed": 5, "cpSpeedComment": null, "logistics": 5, "logisticsComment": null, "packaging": 5, "packagingComment": null, "techService": "Не обращался", "techServiceComment": null, "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": 5, "partnershipPromote": 5, "partnershipUnderstandMarket": 5, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 10, "npsComment": "Наше сотрудничество проверено годами. В работе всегда оперативность, качество, лояльность и профессионализм!"}, {"year": 2025, "id": 111128, "country": "РФ", "tier": "C", "industry": "Электронная коммерция и партнерства", "sat": 5, "satComment": "все ок", "manager": 5, "managerComment": null, "orderSupport": 5, "orderSupportComment": null, "documents": 5, "documentsComment": null, "volume": 5, "volumeComment": null, "quality": 5, "qualityComment": null, "price": 5, "priceComment": null, "paymentTerms": 5, "paymentTermsComment": null, "cpSpeed": 5, "cpSpeedComment": null, "logistics": 5, "logisticsComment": null, "packaging": 5, "packagingComment": null, "techService": "Не обращался", "techServiceComment": null, "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": 5, "partnershipHelpsGrow": 5, "partnershipComment": null, "nps": 10, "npsComment": "все норм"}, {"year": 2025, "id": 111129, "country": "РФ", "tier": "A", "industry": "НефтеГазопереработка и Добыча", "sat": 4, "satComment": null, "manager": 5, "managerComment": null, "orderSupport": 5, "orderSupportComment": null, "documents": 4, "documentsComment": null, "volume": 5, "volumeComment": null, "quality": 5, "qualityComment": null, "price": 4, "priceComment": null, "paymentTerms": 5, "paymentTermsComment": null, "cpSpeed": 5, "cpSpeedComment": null, "logistics": 5, "logisticsComment": null, "packaging": 5, "packagingComment": null, "techService": "Не обращался", "techServiceComment": null, "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": 5, "partnershipPromote": 5, "partnershipUnderstandMarket": 4, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 10, "npsComment": "Надежный партнер и поставщик."}, {"year": 2025, "id": 111130, "country": "РФ", "tier": "C", "industry": "НефтеГазопереработка и Добыча", "sat": 4, "satComment": null, "manager": 5, "managerComment": null, "orderSupport": 5, "orderSupportComment": null, "documents": 4, "documentsComment": "Сделка подписывается несколько дней", "volume": 4, "volumeComment": "Согласование ресурса только в конце месяца", "quality": 5, "qualityComment": null, "price": 5, "priceComment": null, "paymentTerms": 5, "paymentTermsComment": null, "cpSpeed": 5, "cpSpeedComment": null, "logistics": 4, "logisticsComment": "Пироконденсат недостачи", "packaging": 4, "packagingComment": null, "techService": "Не обращался", "techServiceComment": null, "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": 5, "partnershipPromote": 5, "partnershipUnderstandMarket": 5, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 10, "npsComment": "Конкурентный продукт, высокий уровень обслуживания"}, {"year": 2025, "id": 111131, "country": "Китай", "tier": "ND", "industry": "ND", "sat": 5, "satComment": null, "manager": 5, "managerComment": null, "orderSupport": 5, "orderSupportComment": null, "documents": 5, "documentsComment": null, "volume": 5, "volumeComment": null, "quality": 5, "qualityComment": null, "price": 5, "priceComment": null, "paymentTerms": 5, "paymentTermsComment": null, "cpSpeed": 5, "cpSpeedComment": null, "logistics": 5, "logisticsComment": null, "packaging": 5, "packagingComment": null, "techService": "Did not apply", "techServiceComment": null, "webConvenience": null, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 10, "npsComment": "stable supply"}, {"year": 2025, "id": 111132, "country": "Китай", "tier": "ND", "industry": "ND", "sat": 5, "satComment": null, "manager": 5, "managerComment": null, "orderSupport": 5, "orderSupportComment": null, "documents": 5, "documentsComment": null, "volume": 5, "volumeComment": null, "quality": 5, "qualityComment": null, "price": 5, "priceComment": null, "paymentTerms": 5, "paymentTermsComment": null, "cpSpeed": 5, "cpSpeedComment": null, "logistics": 5, "logisticsComment": null, "packaging": 5, "packagingComment": null, "techService": 5, "techServiceComment": "All are good.", "webConvenience": null, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 10, "npsComment": "Good product, good cooperation."}, {"year": 2025, "id": 111133, "country": "Турция", "tier": "ND", "industry": "ND", "sat": 3, "satComment": "We had problems with product quality \nThere are issues that need to be improved in product quality", "manager": 4, "managerComment": "We didn't have a problem", "orderSupport": 3, "orderSupportComment": "We have not had any problems except for the product quality problem \nUnfortunately, a solution to our problem could not be found after the sale, and the detection time took too long to understand the cause of the problem.", "documents": 5, "documentsComment": null, "volume": 4, "volumeComment": null, "quality": 3, "qualityComment": "The product quality definitely needs to be improved. \nThe reason why Siburun is preferred in the market right now is only the price. \nIn my opinion, if the product quality is improved without changing the current prices, a very good result will be achieved.", "price": 5, "priceComment": null, "paymentTerms": 5, "paymentTermsComment": null, "cpSpeed": 5, "cpSpeedComment": null, "logistics": 4, "logisticsComment": null, "packaging": 4, "packagingComment": "Regarding the shipment and delivery, \nAlthough there is no general problem, we have informed the authorities that we think the packaging should be changed to transparent bags. \nThese types of bags have a yellowing problem in the raw material when exposed to the sun.", "techService": 2, "techServiceComment": "When we had a problem, it was too late to return for the cause of the problem \nPackaging should be changed environmentally friendly recycled, like that of other competitors \na paper-based product that does not let the sun in should be used", "webConvenience": null, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 4, "npsComment": "I wouldn't recommend it as a quality \nI would definitely recommend it as a price \nSometimes just the price is not enough \nThe current quality is not suitable for us as price performance \nBut it is suitable for the market and the majority."}, {"year": 2025, "id": 111134, "country": "Турция", "tier": "ND", "industry": "ND", "sat": 5, "satComment": null, "manager": 5, "managerComment": null, "orderSupport": 5, "orderSupportComment": null, "documents": 5, "documentsComment": null, "volume": 5, "volumeComment": null, "quality": 5, "qualityComment": null, "price": 5, "priceComment": null, "paymentTerms": 5, "paymentTermsComment": null, "cpSpeed": 5, "cpSpeedComment": null, "logistics": 5, "logisticsComment": null, "packaging": 5, "packagingComment": null, "techService": 5, "techServiceComment": null, "webConvenience": null, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 9, "npsComment": "With Sibur, we're once again experiencing the incredible impact individuals' working principles have on our perceptions of the company. We're extremely pleased to work with Ahmet Saatci, as are Marina and Anna from customer service. However, we're definitely not able to establish quality communication regarding products that have been transferred from Ahmet to Bekir."}, {"year": 2025, "id": 111135, "country": "Турция", "tier": "ND", "industry": "ND", "sat": 3, "satComment": "YOUR PROCESSES ARE TOO SLOW, THE DOCUMENTS (PROFORMA FTR, FTR, CUSTOMS ETC.) ARRIVE TOO LATE. YOU ARE DELAYING SHIPPING YOUR READY GOODS DESPITE PAYMENT BEING MADE.", "manager": 3, "managerComment": "We are having trouble in communication, the processes are slow.", "orderSupport": 2, "orderSupportComment": "We are having trouble in communication, the processes are slow.", "documents": 2, "documentsComment": "YOUR PROCESSES ARE TOO SLOW. EVEN THOUGH WE HAVE COMMUNICATED OUR COMPLAINTS ABOUT THIS SUBJECT BEFORE, there has been no improvement. Due to delays we have to buy from your competitors.", "volume": 3, "volumeComment": "problems", "quality": 4, "qualityComment": "WE HAVE NOT HAD ANY QUALITY PROBLEMS", "price": 2, "priceComment": null, "paymentTerms": 2, "paymentTermsComment": "THERE IS NO SUCH THING AS PAYMENT FLEXIBILITY. ALWAYS PAY IN ADVANCE.", "cpSpeed": 2, "cpSpeedComment": null, "logistics": 3, "logisticsComment": "Very slow action is taken for ready-made materials. Sibur* operates very slowly within itself.", "packaging": 3, "packagingComment": null, "techService": "SIBUR teknik hizmet desteği almadım", "techServiceComment": null, "webConvenience": null, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 6, "npsComment": "YOUR SLOWNESS AND COMMUNICATION PROBLEMS, INABILITY TO FIND A CONTACT PERSON"}, {"year": 2025, "id": 111136, "country": "Турция", "tier": "ND", "industry": "ND", "sat": 4, "satComment": "overall, we are satisfied", "manager": 4, "managerComment": "we are satisfied", "orderSupport": 4, "orderSupportComment": "we are satisfied", "documents": 4, "documentsComment": "we are satisfied", "volume": 4, "volumeComment": null, "quality": 4, "qualityComment": "Lately, we have been experiencing problems with the slabs we have obtained from the Kazakhstan product due to dust and wetness.", "price": 3, "priceComment": "we are satisfied", "paymentTerms": 3, "paymentTermsComment": null, "cpSpeed": 3, "cpSpeedComment": null, "logistics": 3, "logisticsComment": null, "packaging": 3, "packagingComment": "We have had problems with the packaging, such as torn sacks, wetness, etc.", "techService": 4, "techServiceComment": "Ms. Gülgün has always responded quickly to our problems.", "webConvenience": null, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 8, "npsComment": "you are our supplier that we can always recommend"}, {"year": 2026, "id": 111137, "country": "РФ", "tier": "C", "industry": "Электронная коммерция и партнерства", "sat": 1, "satComment": "Необоснованный рост цен на сырье. Плохая работа менеджера, который не берет трубки, и говорит неправду.", "manager": 1, "managerComment": "Поменять менеджера. Цен не знает, условий отгрузки не знает. Вечером говорит одну информацию, утром совершенно другую. Счета на оплату приходится ждать 5-7 дней. По ценам не всегда актуальная информация.", "orderSupport": 1, "orderSupportComment": "Поменять менеджера. Цен не знает, условий отгрузки не знает. Вечером говорит одну информацию, утром совершенно другую. Счета на оплату приходится ждать 5-7 дней. По ценам не всегда актуальная информация.", "volume": 1, "volumeComment": "После смены клиентского менеджера мы с СИБУРом практически не работаем - ушли к дилерам, и Ставролену. Так как все заявленные тезисы в вопросе не выполняются новым менеджером.", "quality": 3, "qualityComment": "Показатели ПТР не всегда соответствуют заявленным нормам - в пределах партии возможны скачки.", "price": 1, "priceComment": "за месяц подняли цену на 25 руб. Для средних предприятий это очень критично, так как есть тендера, в которых невозможно быстро поднять цену.", "paymentTerms": 1, "paymentTermsComment": "Платим за определенный объем - приезжает меньше. Деньги зависают.\nВсе поддержки, которыми СИБУР так гордится -так называемые \"форсажи\" - работают только для крупных фирм.", "cpSpeed": 1, "cpSpeedComment": "Не менее недели нужно ждать согласования объемов и цен.", "logistics": 5, "logisticsComment": null, "techService": 1, "techServiceComment": "Пытались связаться несколько раз по телефону - невозможно дозвониться. Или занято, или не берут трубку. Запрос обратной связи - никто не отвечал.", "techServiceNoNeed": null, "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": 3, "webConvenienceComment": "Не видно, где и на каких складах можно собрать сборную машину. Это может подсказать только менеджер, а наш не компетентен.", "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": 1, "partnershipHelpsGrow": 1, "partnershipComment": "В последнее время работа с СИБУРом приносит больше неудобств.", "nps": 1, "npsComment": "Политика цен, отношение к мелким и средним компаниям, менеджер, перепады качества продукции."}, {"year": 2026, "id": 111138, "country": "РФ", "tier": "C", "industry": "Электронная коммерция и партнерства", "sat": 2, "satComment": "3 недели не можем забрать оплаченный заказ пвх. Какие-то бесконечные согласования.", "manager": 1, "managerComment": "Отвечать своевременно на вопросы.", "orderSupport": 2, "orderSupportComment": "всё необходимо улучшить", "volume": 2, "volumeComment": "не дают возможности забрать согласованный объем с завода", "quality": 5, "qualityComment": "сырье устраивает", "price": 4, "priceComment": null, "paymentTerms": 5, "paymentTermsComment": null, "cpSpeed": 4, "cpSpeedComment": null, "logistics": 2, "logisticsComment": "не могут согласовать на заводе приезд нашего транспорта", "techService": "Не обращался", "techServiceComment": null, "techServiceNoNeed": "Не было необходимости (всё работает исправно)", "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": 4, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": "Не могу оценить", "partnershipHelpsGrow": "Не могу оценить", "partnershipComment": null, "nps": 4, "npsComment": "проблемы не решаются уже 3 недели"}, {"year": 2026, "id": 111139, "country": "РФ", "tier": "C", "industry": "Электронная коммерция и партнерства", "sat": 1, "satComment": "В марте сделали предзаказ на ПВД 153-003 на апрель, в апреле менеджер его не увидела. Сделали еще раз, снова пропал с сайта.Сделали еще раз, далее его не согласовали, потому что у нас стоял \"самовывоз\", а нам почему-то согласовали \"Доставку\". Чтобы \"ВЫБИТЬ\"разнорядку из ваших менеджеров нужно провести целый день в переписках во всех мессенжерах, начиная от эл почты и заанчивая МАХ.Безобразие.", "manager": 1, "managerComment": "Все. Прежде всего хотя бы брать трубку. Вечно занятые на совещаниях.", "orderSupport": 2, "orderSupportComment": "Написала выше, с сайта заказы пропадают или их криво-косо согласовывают. Сайт супер неудобный, мы тратим личное рабочее время на прихоть вашей организации.", "volume": 3, "volumeComment": "долго согласовывают,много путаницы, часто переспрашивают о заявленных на сайте объемах и марках", "quality": 5, "qualityComment": "нет нет", "price": 1, "priceComment": "дорого, почему такое повышение цен? почему нет уведомления о повышении?", "paymentTerms": 5, "paymentTermsComment": null, "cpSpeed": 2, "cpSpeedComment": "описала выше. сумбур и ошибки", "logistics": 1, "logisticsComment": "много месяцев просили не перекидывать нашу доставку на склад на Черняховского, машина в очереди стояла от 4 до 7 часов, а затем ехала через весь город и еще 70 км до производства. наши просьбу не слышали.", "techService": "Не обращался", "techServiceComment": null, "techServiceNoNeed": null, "techServiceNoInfo": "Не знаю, как это сделать (нет информации о сервисе)", "techServiceBadPast": null, "techServiceOther": null, "webConvenience": 1, "webConvenienceComment": "ужасно. много раз писали на эту тему претензии, высказывали Алексею Косолапову, сейчас Юлии Паршшутиной, и Алисе. Неудобная платформа, долгое время, больше 1,5 лет, просто не могли работать в своем личном кабинете.", "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": "Не могу оценить", "partnershipHelpsGrow": "Не могу оценить", "partnershipComment": null, "nps": 4, "npsComment": "если бы были еще компании, которые продавали сырье как ваша,  с вашими хамами-менеджерами не работали бы совсем."}, {"year": 2026, "id": 111140, "country": "РФ", "tier": "A", "industry": "Гибкая упаковка", "sat": 4, "satComment": "высокие цены", "manager": 4, "managerComment": null, "orderSupport": 4, "orderSupportComment": null, "volume": 4, "volumeComment": null, "quality": 4, "qualityComment": "есть", "price": 2, "priceComment": "выше чем у конкурентов в соседних странах. Готовая продукция заходит в Россию дешевле местного сырья.", "paymentTerms": 2, "paymentTermsComment": "нужна отсрочка", "cpSpeed": 3, "cpSpeedComment": "долго", "logistics": 4, "logisticsComment": null, "techService": 4, "techServiceComment": null, "techServiceNoNeed": null, "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": 4, "webConvenienceComment": null, "partnershipDevelop": "Не могу оценить", "partnershipPromote": 4, "partnershipUnderstandMarket": "Не могу оценить", "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 5, "npsComment": "высокие цены, предоплата"}, {"year": 2026, "id": 111141, "country": "РФ", "tier": "A", "industry": "Транспорт", "sat": 4, "satComment": "Зарабатываете на конъюнктуре, в ущерб долгосрочному сотрудничеству", "manager": 4, "managerComment": null, "orderSupport": 4, "orderSupportComment": null, "volume": 4, "volumeComment": null, "quality": 5, "qualityComment": "Нет.", "price": 3, "priceComment": "Привязка к импортному паритету", "paymentTerms": 3, "paymentTermsComment": "Для постоянных и крупных клиентов нужна отсрочка", "cpSpeed": 4, "cpSpeedComment": null, "logistics": 4, "logisticsComment": null, "techService": "Не обращался", "techServiceComment": null, "techServiceNoNeed": "Не было необходимости (всё работает исправно)", "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": "Не могу оценить", "partnershipPromote": 1, "partnershipUnderstandMarket": "Не могу оценить", "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 5, "npsComment": "Монополист"}, {"year": 2026, "id": 111142, "country": "РФ", "tier": "B", "industry": "Потребительские товары", "sat": 3, "satComment": "Повышение цены", "manager": 5, "managerComment": null, "orderSupport": 5, "orderSupportComment": null, "volume": 5, "volumeComment": null, "quality": 5, "qualityComment": "....", "price": 1, "priceComment": "Резкое, многократное повышение", "paymentTerms": 5, "paymentTermsComment": null, "cpSpeed": 4, "cpSpeedComment": null, "logistics": 5, "logisticsComment": null, "techService": 5, "techServiceComment": null, "techServiceNoNeed": null, "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": "Не могу оценить", "partnershipPromote": "Не могу оценить", "partnershipUnderstandMarket": "Не могу оценить", "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 5, "npsComment": "Нет стабильной ценовой политики"}, {"year": 2026, "id": 111143, "country": "РФ", "tier": "C", "industry": "Электронная коммерция и партнерства", "sat": 4, "satComment": null, "manager": 4, "managerComment": null, "orderSupport": 3, "orderSupportComment": "нет оперативности в информировании, груз уже пришел к нам, а вы еще даже не прислали сообщение об отгрузке от вас.", "volume": 4, "volumeComment": null, "quality": 4, "qualityComment": "пожеланий нет", "price": 4, "priceComment": null, "paymentTerms": 4, "paymentTermsComment": null, "cpSpeed": 3, "cpSpeedComment": "нет оперативности", "logistics": 4, "logisticsComment": null, "techService": 4, "techServiceComment": null, "techServiceNoNeed": null, "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": 4, "partnershipHelpsGrow": 4, "partnershipComment": null, "nps": 6, "npsComment": "Качество продукции высокое, начальный этап заказа быстрый, процесс выставления счета, информирование об отгрузке , получение документов очень затянуто по времени, приходится много раз писать на почту разным сотрудникам. Еще бы знать, кто за что отвечает, пишут этим вопросом занимается другой, этот другой долго отвечает или совсем не отвечает. Поэтому такая оценка."}, {"year": 2026, "id": 111144, "country": "РФ", "tier": "C", "industry": "Агропромышленный комплекс", "sat": null, "satComment": null, "manager": null, "managerComment": null, "orderSupport": null, "orderSupportComment": null, "volume": null, "volumeComment": null, "quality": 2, "qualityComment": "рост цен еженедельно обвалил нашу конкурентные позиции по отношению к импортерам", "price": null, "priceComment": null, "paymentTerms": null, "paymentTermsComment": null, "cpSpeed": null, "cpSpeedComment": null, "logistics": null, "logisticsComment": null, "techService": 4, "techServiceComment": "на некоторые марки сибура отсутствуют или не предоставляются графики разрывной нагрузки", "techServiceNoNeed": null, "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": null, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 6, "npsComment": "ценовая политика"}, {"year": 2026, "id": 111145, "country": "РФ", "tier": "A+", "industry": "Гибкая упаковка", "sat": null, "satComment": null, "manager": null, "managerComment": null, "orderSupport": null, "orderSupportComment": null, "volume": null, "volumeComment": null, "quality": null, "qualityComment": null, "price": null, "priceComment": null, "paymentTerms": null, "paymentTermsComment": null, "cpSpeed": null, "cpSpeedComment": null, "logistics": null, "logisticsComment": null, "techService": null, "techServiceComment": null, "techServiceNoNeed": null, "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": null, "webConvenienceComment": null, "partnershipDevelop": 4, "partnershipPromote": 5, "partnershipUnderstandMarket": 2, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 6, "npsComment": "Стабильность качества от поставки к поставки"}, {"year": 2026, "id": 111146, "country": "РФ", "tier": "C", "industry": "Жесткая упаковка", "sat": 3, "satComment": "товар продают только машинами, паллетами не отгружают.", "manager": 5, "managerComment": null, "orderSupport": 5, "orderSupportComment": null, "volume": 5, "volumeComment": null, "quality": 5, "qualityComment": "нет пожеланий", "price": 1, "priceComment": "очень дорогое сырье.", "paymentTerms": 5, "paymentTermsComment": null, "cpSpeed": 5, "cpSpeedComment": null, "logistics": 5, "logisticsComment": null, "techService": "Не обращался", "techServiceComment": null, "techServiceNoNeed": "Не было необходимости (всё работает исправно)", "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": "Не могу оценить", "partnershipPromote": "Не могу оценить", "partnershipUnderstandMarket": "Не могу оценить", "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 7, "npsComment": "все хорошо, только высокая цена на сырье."}, {"year": 2026, "id": 111147, "country": "РФ", "tier": "A", "industry": "Жесткая упаковка", "sat": 3, "satComment": null, "manager": 4, "managerComment": null, "orderSupport": 4, "orderSupportComment": null, "volume": 3, "volumeComment": "У поставщика нет своих запасов, для сохранения графика поставок клиенту.", "quality": 2, "qualityComment": "Неустойчивые показатели.", "price": 1, "priceComment": "Слишком высокая, для сохранения рынка наших потребителей (молочники)", "paymentTerms": 1, "paymentTermsComment": "Хотели бы отсрочку", "cpSpeed": 4, "cpSpeedComment": null, "logistics": 4, "logisticsComment": null, "techService": 4, "techServiceComment": null, "techServiceNoNeed": null, "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": 3, "webConvenienceComment": "Не видно клиентского менеджера, постоянно вылетающие ошибки", "partnershipDevelop": 4, "partnershipPromote": 4, "partnershipUnderstandMarket": 4, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 7, "npsComment": "Прыгающие показатели материала"}, {"year": 2026, "id": 111148, "country": "РФ", "tier": "A", "industry": "Потребительские товары", "sat": 4, "satComment": null, "manager": 5, "managerComment": null, "orderSupport": 5, "orderSupportComment": null, "volume": 5, "volumeComment": null, "quality": 5, "qualityComment": "вес сырья на паддонах не должна превышать 1350 кг (тяжело при разгрузках", "price": 1, "priceComment": "Цена на сырье не позволяет конкурировать с готовой продукции из Китая", "paymentTerms": 1, "paymentTermsComment": "Нет рассрочки", "cpSpeed": 5, "cpSpeedComment": null, "logistics": 4, "logisticsComment": null, "techService": 4, "techServiceComment": null, "techServiceNoNeed": null, "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": "Не могу оценить", "partnershipPromote": 2, "partnershipUnderstandMarket": 3, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 7, "npsComment": "Высокая цена, нет рассрочки, бывали партии с нестабильным качеством"}, {"year": 2026, "id": 111149, "country": "РФ", "tier": "C", "industry": "Электронная коммерция и партнерства", "sat": 5, "satComment": "Все нравится, кроме роста стоимости продукции", "manager": 5, "managerComment": null, "orderSupport": 4, "orderSupportComment": null, "volume": 5, "volumeComment": null, "quality": 5, "qualityComment": "нету", "price": 1, "priceComment": "PP H350 FF/3", "paymentTerms": 5, "paymentTermsComment": null, "cpSpeed": 5, "cpSpeedComment": null, "logistics": 5, "logisticsComment": null, "techService": "Не обращался", "techServiceComment": null, "techServiceNoNeed": "Не было необходимости (всё работает исправно)", "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": 3, "webConvenienceComment": "Становится удобно, только после получения навыка", "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": 4, "partnershipHelpsGrow": 5, "partnershipComment": null, "nps": 8, "npsComment": "Качественная работа, качественный продукт, отталкивающая цена"}, {"year": 2026, "id": 111150, "country": "РФ", "tier": "B", "industry": "Электронная коммерция и партнерства", "sat": 4, "satComment": null, "manager": 5, "managerComment": null, "orderSupport": 5, "orderSupportComment": null, "volume": 4, "volumeComment": null, "quality": 4, "qualityComment": "Во многих паспортах качества пограничные значения между высшим сортом и 1 сортом.", "price": 3, "priceComment": "Самые дорогие полимеры на рынке РФ.", "paymentTerms": 4, "paymentTermsComment": null, "cpSpeed": 4, "cpSpeedComment": null, "logistics": 5, "logisticsComment": null, "techService": "Не обращался", "techServiceComment": null, "techServiceNoNeed": "Не было необходимости (всё работает исправно)", "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": 4, "partnershipHelpsGrow": 4, "partnershipComment": null, "nps": 8, "npsComment": "Самые дорогие полимеры в РФ."}, {"year": 2026, "id": 111151, "country": "РФ", "tier": "C", "industry": "Электронная коммерция и партнерства", "sat": 5, "satComment": null, "manager": 5, "managerComment": null, "orderSupport": 5, "orderSupportComment": null, "volume": 5, "volumeComment": null, "quality": 5, "qualityComment": "Пожеланий нет. Все хорошо.", "price": 3, "priceComment": "Цену на ПС 925ЕС и 740 хотелось бы ниже для НАС!", "paymentTerms": 5, "paymentTermsComment": null, "cpSpeed": 5, "cpSpeedComment": null, "logistics": 5, "logisticsComment": null, "techService": 5, "techServiceComment": null, "techServiceNoNeed": null, "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": 4, "partnershipHelpsGrow": 5, "partnershipComment": null, "nps": 8, "npsComment": "Практически нет замечаний, но цену для нас на ПС 740 и 825 ЕС хотелось бы ниже."}, {"year": 2026, "id": 111152, "country": "РФ", "tier": "C", "industry": "Электронная коммерция и партнерства", "sat": 5, "satComment": null, "manager": 5, "managerComment": null, "orderSupport": 5, "orderSupportComment": null, "volume": 5, "volumeComment": null, "quality": 4, "qualityComment": "Уменьшить количество крупных частиц продолговатой формы в марке Альапор - 201", "price": 4, "priceComment": null, "paymentTerms": 4, "paymentTermsComment": null, "cpSpeed": 4, "cpSpeedComment": null, "logistics": 4, "logisticsComment": null, "techService": "Не обращался", "techServiceComment": null, "techServiceNoNeed": "Не было необходимости (всё работает исправно)", "techServiceNoInfo": null, "techServiceBadPast": "Прошлый опыт обращения был неудачным (ищу другие пути)", "techServiceOther": null, "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": 5, "partnershipHelpsGrow": "Не могу оценить", "partnershipComment": null, "nps": 9, "npsComment": "Почти все устраивает"}, {"year": 2026, "id": 111153, "country": "РФ", "tier": "A+", "industry": "Строительство", "sat": null, "satComment": null, "manager": null, "managerComment": null, "orderSupport": null, "orderSupportComment": null, "volume": null, "volumeComment": null, "quality": 3, "qualityComment": "Цветовые характеристики ПК иногда вызывают вопросы. Складывается мнение, что в паспорте указано, что ПК ближе к голубому оттенку, а по факту продукция идет с желтоватым оттенком.\nПожелание сузить границы цветовых характеристик a, b на ПК.", "price": null, "priceComment": null, "paymentTerms": null, "paymentTermsComment": null, "cpSpeed": null, "cpSpeedComment": null, "logistics": null, "logisticsComment": null, "techService": 5, "techServiceComment": "Качество работу ТС устраивает. В Telegram был канал Сибур Полилаб с Тех.сервисом, Стройкой, Агро. Когда данный канал будет в Мах? Как правильно обращаться в Тех.сервис?", "techServiceNoNeed": null, "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": null, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 9, "npsComment": "Хорошо организованная структура, с профессиональной командой, которая способна решать любые вопросы для обеспечения качественной продукцией."}, {"year": 2026, "id": 111154, "country": "РФ", "tier": "A", "industry": "Строительство", "sat": 4, "satComment": null, "manager": 4, "managerComment": null, "orderSupport": 4, "orderSupportComment": null, "volume": 5, "volumeComment": null, "quality": 5, "qualityComment": "Нет.", "price": 4, "priceComment": null, "paymentTerms": 4, "paymentTermsComment": null, "cpSpeed": 4, "cpSpeedComment": null, "logistics": 5, "logisticsComment": null, "techService": "Не обращался", "techServiceComment": null, "techServiceNoNeed": "Не было необходимости (всё работает исправно)", "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": "Не могу оценить", "partnershipPromote": "Не могу оценить", "partnershipUnderstandMarket": "Не могу оценить", "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 10, "npsComment": "Надежность поставок, в том числе соблюдение графика поставок, ответственность, гибкость, качество товара."}, {"year": 2026, "id": 111155, "country": "РФ", "tier": "B", "industry": "Агропромышленный комплекс", "sat": 5, "satComment": null, "manager": 5, "managerComment": null, "orderSupport": 5, "orderSupportComment": null, "volume": 5, "volumeComment": null, "quality": 5, "qualityComment": "Все необходимые показатели присутствуют в паспорте", "price": 4, "priceComment": null, "paymentTerms": 5, "paymentTermsComment": null, "cpSpeed": 5, "cpSpeedComment": null, "logistics": 5, "logisticsComment": null, "techService": 5, "techServiceComment": null, "techServiceNoNeed": null, "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": 5, "partnershipPromote": "Не могу оценить", "partnershipUnderstandMarket": "Не могу оценить", "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 10, "npsComment": "Лидер среди поставщиков нефтехимической продукции"}, {"year": 2026, "id": 111156, "country": "РФ", "tier": "A", "industry": "Агропромышленный комплекс", "sat": 5, "satComment": "Надежный партнер, стабильность поставок, высокий уровень сервиса", "manager": 5, "managerComment": null, "orderSupport": 5, "orderSupportComment": null, "volume": 5, "volumeComment": null, "quality": 5, "qualityComment": "В сертификате качества информации достаточно", "price": 5, "priceComment": null, "paymentTerms": 5, "paymentTermsComment": null, "cpSpeed": 5, "cpSpeedComment": null, "logistics": 5, "logisticsComment": null, "techService": "Не обращался", "techServiceComment": null, "techServiceNoNeed": "Не было необходимости (всё работает исправно)", "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": 5, "webConvenienceComment": null, "partnershipDevelop": "Не могу оценить", "partnershipPromote": 5, "partnershipUnderstandMarket": 5, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": "Глубокое понимание потребностей клиентов", "nps": 10, "npsComment": "Сибур помогает партнерам находить решения для повышения эффективности их бизнеса"}, {"year": 2026, "id": 111133, "country": "Турция", "tier": "ND", "industry": "ND", "sat": null, "satComment": null, "manager": null, "managerComment": null, "orderSupport": null, "orderSupportComment": null, "volume": null, "volumeComment": null, "quality": null, "qualityComment": null, "price": null, "priceComment": null, "paymentTerms": null, "paymentTermsComment": null, "cpSpeed": null, "cpSpeedComment": null, "logistics": null, "logisticsComment": null, "techService": null, "techServiceComment": null, "techServiceNoNeed": null, "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": null, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 5, "npsComment": "There is not much of a positive situationResponses arrive late."}, {"year": 2026, "id": 111135, "country": "Турция", "tier": "ND", "industry": "ND", "sat": null, "satComment": null, "manager": null, "managerComment": null, "orderSupport": null, "orderSupportComment": null, "volume": null, "volumeComment": null, "quality": null, "qualityComment": null, "price": null, "priceComment": null, "paymentTerms": null, "paymentTermsComment": null, "cpSpeed": null, "cpSpeedComment": null, "logistics": null, "logisticsComment": null, "techService": null, "techServiceComment": null, "techServiceNoNeed": null, "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": null, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 6, "npsComment": "product quality is satisfactoryproblems in processes and order management; delays in invoices and other documentation."}, {"year": 2026, "id": 111136, "country": "Турция", "tier": "ND", "industry": "ND", "sat": null, "satComment": null, "manager": null, "managerComment": null, "orderSupport": null, "orderSupportComment": null, "volume": null, "volumeComment": null, "quality": null, "qualityComment": null, "price": null, "priceComment": null, "paymentTerms": null, "paymentTermsComment": null, "cpSpeed": null, "cpSpeedComment": null, "logistics": null, "logisticsComment": null, "techService": null, "techServiceComment": null, "techServiceNoNeed": null, "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": null, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 7, "npsComment": "Their helpfulness during the supply processThey could be a bit faster."}, {"year": 2026, "id": 111131, "country": "Китай", "tier": "ND", "industry": "ND", "sat": null, "satComment": null, "manager": null, "managerComment": null, "orderSupport": null, "orderSupportComment": null, "volume": null, "volumeComment": null, "quality": null, "qualityComment": null, "price": null, "priceComment": null, "paymentTerms": null, "paymentTermsComment": null, "cpSpeed": null, "cpSpeedComment": null, "logistics": null, "logisticsComment": null, "techService": null, "techServiceComment": null, "techServiceNoNeed": null, "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": null, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 8, "npsComment": "Consistent productSmall supply volume, low continuity"}, {"year": 2026, "id": 111134, "country": "Турция", "tier": "ND", "industry": "ND", "sat": null, "satComment": null, "manager": null, "managerComment": null, "orderSupport": null, "orderSupportComment": null, "volume": null, "volumeComment": null, "quality": null, "qualityComment": null, "price": null, "priceComment": null, "paymentTerms": null, "paymentTermsComment": null, "cpSpeed": null, "cpSpeedComment": null, "logistics": null, "logisticsComment": null, "techService": null, "techServiceComment": null, "techServiceNoNeed": null, "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": null, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 9, "npsComment": "solution-oriented and collaborativeIt is very difficult for us to reach some sales personnel."}, {"year": 2026, "id": 111132, "country": "Китай", "tier": "ND", "industry": "ND", "sat": null, "satComment": null, "manager": null, "managerComment": null, "orderSupport": null, "orderSupportComment": null, "volume": null, "volumeComment": null, "quality": null, "qualityComment": null, "price": null, "priceComment": null, "paymentTerms": null, "paymentTermsComment": null, "cpSpeed": null, "cpSpeedComment": null, "logistics": null, "logisticsComment": null, "techService": null, "techServiceComment": null, "techServiceNoNeed": null, "techServiceNoInfo": null, "techServiceBadPast": null, "techServiceOther": null, "webConvenience": null, "webConvenienceComment": null, "partnershipDevelop": null, "partnershipPromote": null, "partnershipUnderstandMarket": null, "partnershipUnderstandUs": null, "partnershipHelpsGrow": null, "partnershipComment": null, "nps": 10, "npsComment": "All positiveNo negative experiences for now"}];
+
+const DRIVERS = [
+  {key:'sat', label:'Общая удовлетворённость', commentKey:'satComment'},
+  {key:'manager', label:'Взаимодействие с менеджером', commentKey:'managerComment'},
+  {key:'orderSupport', label:'Сопровождение заказа', commentKey:'orderSupportComment'},
+  {key:'documents', label:'Оформление документов', commentKey:'documentsComment', onlyYears:[2025]},
+  {key:'volume', label:'Объём выполнения поставок', commentKey:'volumeComment'},
+  {key:'quality', label:'Качество продукции', commentKey:'qualityComment'},
+  {key:'price', label:'Цена', commentKey:'priceComment'},
+  {key:'paymentTerms', label:'Условия оплаты', commentKey:'paymentTermsComment'},
+  {key:'cpSpeed', label:'Скорость КП', commentKey:'cpSpeedComment'},
+  {key:'logistics', label:'Логистика', commentKey:'logisticsComment'},
+  {key:'packaging', label:'Качество упаковки', commentKey:'packagingComment', onlyYears:[2025]},
+  {key:'techService', label:'Технический сервис', commentKey:'techServiceComment'},
+  {key:'webConvenience', label:'Удобство интернет-магазина', commentKey:'webConvenienceComment'},
+  {key:'partnershipDevelop', label:'Партнёрство: совместная разработка', commentKey:null},
+  {key:'partnershipPromote', label:'Партнёрство: продвижение в отрасли', commentKey:null},
+  {key:'partnershipUnderstandMarket', label:'Понимание потребностей рынка', commentKey:null},
+  {key:'partnershipUnderstandUs', label:'Понимание потребностей компании', commentKey:null},
+  {key:'partnershipHelpsGrow', label:'Партнёрство помогает развиваться', commentKey:null},
+];
+const THEME_KEYWORDS = [
+  ['Цена', ['цен','дорог','стоимост','price','expensive']],
+  ['Условия оплаты', ['оплат','рассроч','отсрочк','предоплат','payment']],
+  ['Менеджер', ['менеджер','manager','sales personnel','персонал','сотрудник']],
+  ['Скорость ответа', ['медленно','долго','не отвеча','дозвон','slow','late','delay','arrive late']],
+  ['Оформление документов', ['документ','эдо','счет','счёт','invoice','documentation']],
+  ['Объёмы поставок', ['объем','объём','поставк','volume','supply','continuity']],
+  ['Логистика', ['логистик','доставк','транспорт','машин','logistic','shipping']],
+  ['Качество продукции', ['качеств','брак','газит','quality']],
+  ['Интернет-магазин', ['личном кабинете',' лк ','сайт','интернет-магазин','website']],
+  ['Технический сервис', ['техническ','техсервис','tech service','technical']],
+  ['Партнёрство', ['партнер','партнёр','partnership','collaborat']],
+  ['Ассортимент', ['ассортимент','марк']],
+  ['Коммуникация', ['коммуникац','связ','contact person','communication','reach']],
+  ['Стабильность', ['стабильн','consistent','continuity']],
+  ['Монопольное положение', ['монопол','monopol']],
+  ['Сопровождение заказа', ['сопровожд','заказ','order']],
+];
+const MIN_N_RELIABLE = 8;
+const STORAGE_KEY = 'spectra360.uiState.v1';
+
+/* =========================================================================
+   СЕКЦИЯ 2. НОРМАЛИЗАЦИЯ ДАННЫХ
+   Данные уже приведены к единой схеме на этапе подготовки файла (названия
+   полей унифицированы по смыслу показателя, а не по позиции колонки).
+   Здесь — один защитный проход: приводим типы id/year к числу и замораживаем
+   массив, чтобы исходные данные нельзя было случайно изменить при рендере.
+   Повторная нормализация при каждом фильтре не выполняется — это дорого и
+   не нужно, фильтрация работает поверх уже готового RAW_DATA.
+   ========================================================================= */
+function normalizeDataset(src){
+  return src.map(row=>{
+    const r = Object.assign({}, row);
+    r.id = Number(r.id);
+    r.year = Number(r.year);
+    return Object.freeze(r);
+  });
+}
+const RAW_DATA = Object.freeze(normalizeDataset(RAW_DATA_SOURCE));
+
+/* =========================================================================
+   СЕКЦИЯ 3. РАСЧЁТЫ
+   ========================================================================= */
+function escapeHtml(s){
+  if(s===null||s===undefined) return '';
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function isNum(v){ return typeof v==='number' && !isNaN(v); }
+function mean(rows, key){
+  const vals = rows.map(r=>r[key]).filter(isNum);
+  if(vals.length===0) return {value:null, n:0};
+  return {value: vals.reduce((a,b)=>a+b,0)/vals.length, n:vals.length};
+}
+function median(rows, key){
+  const vals = rows.map(r=>r[key]).filter(isNum).sort((a,b)=>a-b);
+  if(vals.length===0) return {value:null,n:0};
+  const mid=Math.floor(vals.length/2);
+  return {value: vals.length%2 ? vals[mid] : (vals[mid-1]+vals[mid])/2, n:vals.length};
+}
+function distribution(rows, key, min, max){
+  const counts = {};
+  for(let i=min;i<=max;i++) counts[i]=0;
+  rows.forEach(r=>{ if(isNum(r[key]) && r[key]>=min && r[key]<=max) counts[Math.round(r[key])]++; });
+  return counts;
+}
+function npsSegmentOf(v){ if(!isNum(v)) return null; if(v>=9) return 'promoter'; if(v>=7) return 'passive'; return 'detractor'; }
+function npsCalc(rows){
+  const vals = rows.map(r=>r.nps).filter(isNum);
+  const n = vals.length;
+  if(n===0) return {nps:null,n:0,promoters:0,passives:0,detractors:0,promoterPct:0,passivePct:0,detractorPct:0};
+  const promoters = vals.filter(v=>v>=9).length, passives = vals.filter(v=>v>=7&&v<=8).length, detractors = vals.filter(v=>v<=6).length;
+  return { nps: Math.round((promoters-detractors)/n*1000)/10, n, promoters, passives, detractors,
+    promoterPct: Math.round(promoters/n*1000)/10, passivePct: Math.round(passives/n*1000)/10, detractorPct: Math.round(detractors/n*1000)/10 };
+}
+function pearson(rows, keyX, keyY){
+  const pairs = rows.filter(r=>isNum(r[keyX]) && isNum(r[keyY]));
+  const n = pairs.length;
+  if(n<3) return {r:null, n};
+  const xs=pairs.map(r=>r[keyX]), ys=pairs.map(r=>r[keyY]);
+  const mx=xs.reduce((a,b)=>a+b,0)/n, my=ys.reduce((a,b)=>a+b,0)/n;
+  let num=0,dx=0,dy=0;
+  for(let i=0;i<n;i++){ num+=(xs[i]-mx)*(ys[i]-my); dx+=(xs[i]-mx)**2; dy+=(ys[i]-my)**2; }
+  if(dx===0||dy===0) return {r:null,n};
+  return {r: Math.round(num/Math.sqrt(dx*dy)*100)/100, n};
+}
+function groupBy(rows, key){
+  const map = {};
+  rows.forEach(r=>{ const v=r[key]; if(v===null||v===undefined) return; (map[v]=map[v]||[]).push(r); });
+  return map;
+}
+function segmentedNps(rows, key){
+  return Object.entries(groupBy(rows,key)).map(([g,rs])=>({group:g, ...npsCalc(rs)})).sort((a,b)=>(b.nps??-999)-(a.nps??-999));
+}
+function segmentedNpsGeneric(rows, groupKey, valueKey){
+  return Object.entries(groupBy(rows,groupKey)).map(([g,rs])=>({group:g, ...mean(rs,valueKey)})).filter(g=>g.value!==null).sort((a,b)=>b.value-a.value);
+}
+function classifyTheme(text){
+  if(!text) return null;
+  const t = String(text).toLowerCase();
+  for(const [theme, kws] of THEME_KEYWORDS){ if(kws.some(k=>t.includes(k))) return theme; }
+  return 'Другое';
+}
+function toneFromScore(score){
+  if(!isNum(score)) return {label:'не определено', cls:'d-flat'};
+  if(score>=4) return {label:'позитивная', cls:'d-up'};
+  if(score===3) return {label:'нейтральная', cls:'d-flat'};
+  return {label:'негативная', cls:'d-down'};
+}
+function fmtDelta(a,b,digits){
+  digits = digits===undefined?1:digits;
+  if(a===null||b===null||a===undefined||b===undefined) return null;
+  const d = Math.round((a-b)*Math.pow(10,digits))/Math.pow(10,digits);
+  return d;
+}
+function deltaTag(d){
+  if(d===null) return `<span class="tag tag-empty">нет данных для сравнения</span>`;
+  const cls = d===0?'d-flat':(d>0?'d-up':'d-down');
+  return `<span class="kpi-delta ${cls}">${d>0?'+':''}${d}</span>`;
+}
+function smallSampleWarning(n){ return n < MIN_N_RELIABLE ? `<span class="warn-badge">⚠ n=${n} — недостаточно наблюдений для надёжного вывода</span>` : ''; }
+function getYearRows(y){ return RAW_DATA.filter(r=>r.year===y); }
+function getTrackedClients(){
+  const r25=getYearRows(2025), r26=getYearRows(2026);
+  const ids26=new Set(r26.map(r=>r.id)); const out=[];
+  r25.forEach(row25=>{ if(ids26.has(row25.id)){ const row26=r26.find(r=>r.id===row25.id);
+    out.push({id:row25.id,row25,row26,deltaNps:fmtDelta(row26.nps,row25.nps,0),deltaSat:fmtDelta(row26.sat,row25.sat,0)}); }});
+  return out;
+}
+function uniqueClientRows(rows){
+  const map={}; rows.slice().sort((a,b)=>a.year-b.year).forEach(r=>{map[r.id]=r;}); return Object.values(map);
+}
+function buildCommentsFeed(rows){
+  const out=[];
+  rows.forEach(r=>{
+    DRIVERS.forEach(d=>{ if(d.commentKey && r[d.commentKey]){
+      out.push({key:r.id+'-'+r.year+'-'+d.key, id:r.id, year_:r.year, country:r.country, tier:r.tier, industry:r.industry,
+        metric:d.label, score:r[d.key], text:r[d.commentKey], nps:r.nps, seg:npsSegmentOf(r.nps),
+        theme:classifyTheme(r[d.commentKey]), tone:toneFromScore(isNum(r[d.key])?r[d.key]:null)});
+    }});
+    if(r.npsComment){ out.push({key:r.id+'-'+r.year+'-nps', id:r.id, year_:r.year, country:r.country, tier:r.tier, industry:r.industry,
+      metric:'Готовность рекомендовать (NPS)', score:r.nps, text:r.npsComment, nps:r.nps, seg:npsSegmentOf(r.nps),
+      theme:classifyTheme(r.npsComment), tone: isNum(r.nps)?(r.nps>=9?{label:'позитивная',cls:'d-up'}:(r.nps>=7?{label:'нейтральная',cls:'d-flat'}:{label:'негативная',cls:'d-down'})):{label:'не определено',cls:'d-flat'}}); }
+    if(r.partnershipComment){ out.push({key:r.id+'-'+r.year+'-partner', id:r.id, year_:r.year, country:r.country, tier:r.tier, industry:r.industry,
+      metric:'Партнёрство (общий комментарий)', score:null, text:r.partnershipComment, nps:r.nps, seg:npsSegmentOf(r.nps),
+      theme:classifyTheme(r.partnershipComment), tone:{label:'не определено',cls:'d-flat'}}); }
+  });
+  return out;
+}
+function buildAutoSummary(clientRows, last){
+  const parts=[];
+  const scored = DRIVERS.map(d=>({label:d.label,v:last[d.key]})).filter(d=>isNum(d.v));
+  if(scored.length){
+    const worst=scored.slice().sort((a,b)=>a.v-b.v)[0], best=scored.slice().sort((a,b)=>b.v-a.v)[0];
+    parts.push(`Самая низкая оценка клиента — «${worst.label}» (${worst.v} из 5), самая высокая — «${best.label}» (${best.v} из 5).`);
+  }
+  if(isNum(last.nps)) parts.push(`Итоговая оценка готовности рекомендовать за волну ${last.year} — ${last.nps} из 10 (сегмент: ${segRu(npsSegmentOf(last.nps))}).`);
+  if(clientRows.length>=2){ const d=fmtDelta(clientRows[1].nps, clientRows[0].nps, 0); if(d!==null) parts.push(`Изменение NPS год к году: ${d>0?'+':''}${d} балл(ов).`); }
+  if(last.npsComment) parts.push(`Комментарий клиента: «${last.npsComment}».`);
+  return parts.join(' ') || 'Недостаточно фактических данных для резюме.';
+}
+function segRu(s){ return {promoter:'промоутер',passive:'нейтрал',detractor:'детрактор'}[s]||'—'; }
+
+/* -------------------------------------------------------------------------
+   ПРЕДИКТИВНАЯ АНАЛИТИКА
+   Важный принцип: никаких «магических» ИИ-чисел без объяснения. Каждый
+   прогноз и каждая оценка риска строится по прозрачной, проверяемой формуле
+   поверх реальных цифр и подписывается как оценка/индикатор, а не факт.
+   При двух точках замера (2025, 2026) прогноз — это простая линейная
+   экстраполяция; это статистически слабый прогноз, и интерфейс обязан
+   честно на это указывать.
+   ------------------------------------------------------------------------- */
+const PARTNERSHIP_KEYS = ['partnershipDevelop','partnershipPromote','partnershipUnderstandMarket','partnershipUnderstandUs','partnershipHelpsGrow'];
+function computePartnershipIndex(rows){
+  const vals = [];
+  rows.forEach(r=>{ PARTNERSHIP_KEYS.forEach(k=>{ if(isNum(r[k])) vals.push(r[k]); }); });
+  if(vals.length===0) return {value:null,n:0};
+  return {value: vals.reduce((a,b)=>a+b,0)/vals.length, n:vals.length};
+}
+// Простая линейная экстраполяция NPS компании на следующую волну по двум
+// имеющимся точкам. Возвращает null, если для расчёта недостаточно данных.
+function computeNpsForecast(){
+  const r25 = applyGlobalFilters(getYearRows(2025)), r26 = applyGlobalFilters(getYearRows(2026));
+  const n25 = npsCalc(r25), n26 = npsCalc(r26);
+  if(n25.nps===null || n26.nps===null) return null;
+  const delta = Math.round((n26.nps-n25.nps)*10)/10;
+  const forecast = Math.round((n26.nps+delta)*10)/10;
+  return {n25:n25.nps, n26:n26.nps, delta, forecast, sampleN25:n25.n, sampleN26:n26.n};
+}
+// Прозрачная rule-based оценка риска оттока клиента: каждое правило
+// объясняется отдельной строкой в reasons[], итоговый score — их сумма
+// (0-100). Это не модель машинного обучения, а явная, проверяемая эвристика
+// поверх реальных ответов клиента — так честнее, чем выдавать чёрный ящик.
+function computeChurnRisk(clientRows, last){
+  let score = 0; const reasons = [];
+  const seg = npsSegmentOf(last.nps);
+  if(seg==='detractor'){ score+=40; reasons.push({text:'Клиент в сегменте «детрактор» (NPS ≤ 6)', pts:40}); }
+  else if(seg==='passive'){ score+=15; reasons.push({text:'Клиент в сегменте «нейтрал» (NPS 7–8) — не защищён от оттока', pts:15}); }
+  else if(!seg){ score+=10; reasons.push({text:'Нет ответа по NPS за последнюю волну — риск неизвестен', pts:10}); }
+  if(clientRows.length>=2){
+    const delta = fmtDelta(clientRows[clientRows.length-1].nps, clientRows[clientRows.length-2].nps, 0);
+    if(delta!==null){
+      if(delta<=-3){ score+=30; reasons.push({text:`Резкое падение NPS год к году: ${delta}`, pts:30}); }
+      else if(delta<0){ score+=18; reasons.push({text:`Снижение NPS год к году: ${delta}`, pts:18}); }
+      else if(delta>0){ score=Math.max(0,score-10); reasons.push({text:`NPS вырос год к году: +${delta} (снижает риск)`, pts:-10}); }
+    }
+  }
+  [['price','Цена'],['manager','Взаимодействие с менеджером'],['techService','Технический сервис']].forEach(([k,label])=>{
+    if(isNum(last[k]) && last[k]<=2){ score+=10; reasons.push({text:`Низкая оценка «${label}»: ${last[k]} из 5`, pts:10}); }
+  });
+  const riskyThemes = new Set(['Цена','Коммуникация','Менеджер']);
+  const feedThemes = new Set();
+  DRIVERS.forEach(d=>{ if(d.commentKey && last[d.commentKey]) feedThemes.add(classifyTheme(last[d.commentKey])); });
+  if(last.npsComment) feedThemes.add(classifyTheme(last.npsComment));
+  feedThemes.forEach(t=>{ if(riskyThemes.has(t)){ score+=5; reasons.push({text:`В комментариях затронута тема «${t}»`, pts:5}); } });
+  score = Math.max(0, Math.min(100, score));
+  const level = score>=60?'высокий':(score>=30?'средний':'низкий');
+  return {score, level, reasons};
+}
+// Список клиентов с наивысшим риском по последней доступной волне —
+// используется в вотчлисте на обзорном экране.
+function computeRiskWatchlist(rows, limit){
+  const byId = uniqueClientRows(rows);
+  const scored = byId.map(r=>{
+    const clientRows = RAW_DATA.filter(x=>x.id===r.id).sort((a,b)=>a.year-b.year);
+    const risk = computeChurnRisk(clientRows, r);
+    return {row:r, risk};
+  });
+  scored.sort((a,b)=>b.risk.score-a.risk.score);
+  return scored.slice(0, limit||8);
+}
+// Собирает 3-5 фактических инсайтов по текущей выборке (для панели
+// "Что показывают данные"). Каждая строка — производная реальных расчётов,
+// а не текст, придуманный заранее.
+function buildExecutiveInsights(rows){
+  const insights = [];
+  const r25=applyGlobalFilters(getYearRows(2025)), r26=applyGlobalFilters(getYearRows(2026));
+  const n25=npsCalc(r25), n26=npsCalc(r26), s25=mean(r25,'sat'), s26=mean(r26,'sat');
+  if(n25.n>0 && n26.n>0){
+    const npsDelta = fmtDelta(n26.nps,n25.nps,1), satDelta = fmtDelta(s26.value,s25.value,2);
+    if(npsDelta!==null && satDelta!==null && npsDelta<0 && satDelta>0){
+      insights.push(`NPS снизился (${npsDelta} п.п.), при этом общая удовлетворённость выросла (+${satDelta}) — расхождение указывает на конкретный болевой фактор, а не общее охлаждение отношений.`);
+    }
+  }
+  const priceM25=mean(r25,'price'), priceM26=mean(r26,'price');
+  if(priceM25.value!==null && priceM26.value!==null){
+    const d = Math.round((priceM26.value-priceM25.value)*100)/100;
+    if(d<=-0.5) insights.push(`Оценка «Цена» упала с ${priceM25.value.toFixed(2)} до ${priceM26.value.toFixed(2)} — самое резкое движение среди всех драйверов.`);
+  }
+  const tracked = getTrackedClients();
+  const quiet = tracked.filter(t=>t.deltaNps<0 && npsSegmentOf(t.row26.nps)!=='detractor');
+  if(quiet.length>0) insights.push(`${quiet.length} клиент(а/ов) снижают NPS год к году, оставаясь формально в «безопасном» сегменте — риск не виден по одной итоговой цифре.`);
+  const corr26 = DRIVERS.map(d=>({label:d.label, c:pearson(r26,d.key,'nps')})).filter(d=>d.c.r!==null && d.c.n>=MIN_N_RELIABLE).sort((a,b)=>b.c.r-a.c.r);
+  if(corr26.length) insights.push(`Сильнее всего с NPS 2026 связан драйвер «${corr26[0].label}» (r=${corr26[0].c.r}, n=${corr26[0].c.n}).`);
+  const watch = computeRiskWatchlist(rows, 100).filter(w=>w.risk.level==='высокий');
+  if(watch.length>0) insights.push(`${watch.length} клиент(а/ов) в текущей выборке отмечены как клиенты с высоким риском оттока по совокупности признаков.`);
+  return insights.slice(0,5);
+}
+
+/* =========================================================================
+   СЕКЦИЯ 4. УПРАВЛЕНИЕ СОСТОЯНИЕМ
+   Единый объект состояния приложения. Любое его изменение проходит через
+   централизованные функции render()/renderScreen(), которые управляют
+   перерисовкой. localStorage используется ТОЛЬКО для UI-настроек
+   (выбранный раздел, фильтры) — не для хранения исходных данных.
+   ========================================================================= */
+const appState = {
+  screen:'overview',
+  period:'2026',
+  country:'all', industry:'all', tier:'all', npsSegment:'all',
+  search:'',
+  selectedClientId:null,
+  clientsMode:'unique', clientsPreset:'none', clientsSort:{key:'nps',dir:'desc'}, clientsPage:0,
+  commentsSort:{key:'year_',dir:'desc'}, commentsSearch:'', commentsTheme:'all', commentsPage:0,
+  comparisonMode:'all', driverPickHist:'sat', profileTab:'overview',
+};
+function persistState(){
+  try{
+    const toSave = {screen:appState.screen, period:appState.period, country:appState.country, industry:appState.industry,
+      tier:appState.tier, npsSegment:appState.npsSegment};
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+  }catch(e){ /* localStorage недоступен (приватный режим, файловые ограничения и т.п.) — просто продолжаем без сохранения */ }
+}
+function loadPersistedState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return;
+    const saved = JSON.parse(raw);
+    Object.assign(appState, saved);
+  }catch(e){ /* игнорируем — приложение работает с настройками по умолчанию */ }
+}
+function debounce(fn, ms){
+  let t=null;
+  return function(...args){ clearTimeout(t); t=setTimeout(()=>fn.apply(this,args), ms); };
+}
+
+/* =========================================================================
+   СЕКЦИЯ 5. ФИЛЬТРЫ
+   ========================================================================= */
+function getBaseRows(){
+  if(appState.period==='2025') return getYearRows(2025);
+  if(appState.period==='2026') return getYearRows(2026);
+  return RAW_DATA.slice();
+}
+function matchesSearch(r, q){
+  if(!q) return true;
+  q = q.toLowerCase();
+  if(String(r.id).includes(q)) return true;
+  if((r.country||'').toLowerCase().includes(q)) return true;
+  if((r.industry||'').toLowerCase().includes(q)) return true;
+  for(const d of DRIVERS){ if(d.commentKey && r[d.commentKey] && String(r[d.commentKey]).toLowerCase().includes(q)) return true; }
+  if(r.npsComment && String(r.npsComment).toLowerCase().includes(q)) return true;
+  return false;
+}
+function applyGlobalFilters(rows){
+  return rows.filter(r=>
+    (appState.country==='all'||r.country===appState.country) &&
+    (appState.industry==='all'||r.industry===appState.industry) &&
+    (appState.tier==='all'||r.tier===appState.tier) &&
+    (appState.npsSegment==='all'||npsSegmentOf(r.nps)===appState.npsSegment) &&
+    matchesSearch(r, appState.search));
+}
+function getFilteredRows(){ return applyGlobalFilters(getBaseRows()); }
+function applyClientsPreset(rows){
+  const tracked = getTrackedClients();
+  switch(appState.clientsPreset){
+    case 'detractors': return rows.filter(r=>npsSegmentOf(r.nps)==='detractor');
+    case 'promoters': return rows.filter(r=>npsSegmentOf(r.nps)==='promoter');
+    case 'managerLow': return rows.filter(r=>isNum(r.manager)&&r.manager<=2);
+    case 'priceLow': return rows.filter(r=>isNum(r.price)&&r.price<=2);
+    case 'qualityLow': return rows.filter(r=>isNum(r.quality)&&r.quality<=2);
+    case 'negComments': return rows.filter(r=>isNum(r.nps)&&r.nps<=6 && r.npsComment);
+    case 'tracked': { const ids=new Set(tracked.map(t=>t.id)); return rows.filter(r=>ids.has(r.id)); }
+    case 'npsUp': { const ids=new Set(tracked.filter(t=>t.deltaNps>0).map(t=>t.id)); return rows.filter(r=>ids.has(r.id)); }
+    case 'npsDown': { const ids=new Set(tracked.filter(t=>t.deltaNps<0).map(t=>t.id)); return rows.filter(r=>ids.has(r.id)); }
+    default: return rows;
+  }
+}
+function sortRows(rows, key, dir, numeric){
+  return rows.slice().sort((a,b)=>{
+    let va=a[key], vb=b[key];
+    if(numeric){ va=isNum(va)?va:-Infinity; vb=isNum(vb)?vb:-Infinity; } else { va=(va??'').toString(); vb=(vb??'').toString(); }
+    if(va<vb) return dir==='asc'?-1:1; if(va>vb) return dir==='asc'?1:-1; return 0;
+  });
+}
+function paginate(rows, page, pageSize){
+  const totalPages = Math.max(1, Math.ceil(rows.length/pageSize));
+  const p = Math.min(Math.max(0,page), totalPages-1);
+  return {page:p, totalPages, slice: rows.slice(p*pageSize, p*pageSize+pageSize)};
+}
+
+/* =========================================================================
+   СЕКЦИЯ 6. РЕНДЕРИНГ KPI
+   ========================================================================= */
+function kpiCard(value, label, n, deltaHtml, drillKey){
+  return `<div class="card kpi" ${drillKey?`data-action="drill" data-drill="${drillKey}"`:''}>
+    <span class="num">${value===null||value===undefined?'—':escapeHtml(value)}</span>
+    <span class="kpi-label">${escapeHtml(label)}</span>
+    ${n!==undefined?`<div class="kpi-n">n=${n}</div>`:''}
+    ${deltaHtml||''}
+  </div>`;
+}
+function kpiSmall(m, label){
+  return `<div class="card kpi"><span class="num">${m.value===null?'—':m.value.toFixed(2)}</span><span class="kpi-label">${escapeHtml(label)}</span><div class="kpi-n">n=${m.n}</div></div>`;
+}
+function periodLabel(){ return appState.period==='both' ? '2025+2026 объединённо' : appState.period; }
+
+/* =========================================================================
+   СЕКЦИЯ 7. РЕНДЕРИНГ ГРАФИКОВ
+   Без сторонних библиотек — чистый inline SVG, генерируемый вручную.
+   Все графики пересчитываются при каждом изменении фильтров, поскольку
+   строятся из текущего отфильтрованного набора данных, а не сохраняются
+   как статичные изображения. Каждый вызов обёрнут в safeDraw(), чтобы
+   ошибка в одном графике не ломала остальной интерфейс (см. СЕКЦИЮ 12).
+   ========================================================================= */
+function safeDraw(containerId, fn){
+  const el = document.getElementById(containerId);
+  if(!el) return; // элемента может не быть на экране — просто выходим
+  try{ fn(el); }
+  catch(e){
+    el.innerHTML = `<div class="chart-err">Не удалось построить график: ${escapeHtml(e.message)}</div>`;
+    console.error('[spectra] chart error in #'+containerId, e);
+  }
+}
+function shortLabel(s, len){ len=len||16; s=String(s); return s.length>len ? s.slice(0,len-1)+'…' : s; }
+function svgWrap(w,h,inner){ return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="xMinYMid meet">${inner}</svg>`; }
+
+// Простой вертикальный столбчатый график (значения могут быть отрицательными — есть нулевая линия).
+function barChart(el, {labels, values, colors, yMin, yMax, height, valueFmt}){
+  height = height||220;
+  const W=680,H=height, padL=42,padR=10,padT=10,padB=30;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const n=Math.max(1,labels.length);
+  const gap=plotW/n, bw=Math.min(46, gap*0.6);
+  const dm=yMin, dM=yMax;
+  const yScale = v => padT + plotH - ((v-dm)/(dM-dm))*plotH;
+  const zeroY = yScale(Math.max(dm,Math.min(dM,0)));
+  let bars='', axis='';
+  labels.forEach((lab,i)=>{
+    const v = values[i];
+    const x = padL + gap*i + (gap-bw)/2;
+    if(v===null||v===undefined||isNaN(v)){
+      axis += `<text x="${(x+bw/2).toFixed(1)}" y="${H-8}" font-size="9" text-anchor="middle" fill="#6C8A91">${escapeHtml(shortLabel(lab,12))}</text>`;
+      return;
+    }
+    const y1 = yScale(v);
+    const top = Math.min(y1, zeroY), h = Math.max(1,Math.abs(y1-zeroY));
+    const color = colors ? colors[i] : '#1D6E85';
+    bars += `<rect x="${x.toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${color}"><title>${escapeHtml(lab)}: ${valueFmt?escapeHtml(valueFmt(v)):v}</title></rect>`;
+    axis += `<text x="${(x+bw/2).toFixed(1)}" y="${H-8}" font-size="9" text-anchor="middle" fill="#6C8A91">${escapeHtml(shortLabel(lab,12))}</text>`;
+  });
+  const gridline = `<line x1="${padL}" x2="${W-padR}" y1="${zeroY.toFixed(1)}" y2="${zeroY.toFixed(1)}" stroke="#B7D8DE" stroke-width="1"/>`;
+  const yLabels = `<text x="4" y="${padT+4}" font-size="9" fill="#6C8A91">${dM}</text><text x="4" y="${H-padB}" font-size="9" fill="#6C8A91">${dm}</text>`;
+  el.innerHTML = svgWrap(W,H, gridline+bars+axis+yLabels);
+}
+// Горизонтальный столбчатый график — удобен для длинных подписей (драйверы, темы).
+function hBarChart(el, {labels, values, colors, max, height, valueFmt}){
+  const rowH = 26, padL=170, padR=50, padT=6;
+  const H = height || (labels.length*rowH+padT*2);
+  const W = 680, plotW = W-padL-padR;
+  const dM = max===undefined ? Math.max(1,...values.filter(isNum)) : max;
+  let rows='';
+  labels.forEach((lab,i)=>{
+    const v = values[i];
+    const y = padT + i*rowH;
+    const w = isNum(v) ? Math.max(1, v/dM*plotW) : 0;
+    const color = colors ? colors[i] : '#1D6E85';
+    rows += `<text x="${padL-8}" y="${y+rowH*0.62}" font-size="10" text-anchor="end" fill="#47585C">${escapeHtml(shortLabel(lab,24))}</text>`;
+    if(isNum(v)){
+      rows += `<rect x="${padL}" y="${(y+4).toFixed(1)}" width="${w.toFixed(1)}" height="${rowH-8}" rx="3" fill="${color}"><title>${escapeHtml(lab)}: ${valueFmt?escapeHtml(valueFmt(v)):v}</title></rect>`;
+      rows += `<text x="${(padL+w+6).toFixed(1)}" y="${y+rowH*0.62}" font-size="9.5" fill="#47585C" font-family="ui-monospace,monospace">${valueFmt?escapeHtml(valueFmt(v)):v}</text>`;
+    } else {
+      rows += `<text x="${padL+4}" y="${y+rowH*0.62}" font-size="9.5" fill="#6C8A91">н/д</text>`;
+    }
+  });
+  el.innerHTML = svgWrap(W,H, rows);
+}
+// Линейный график с прогнозной точкой: сплошная линия по фактическим точкам,
+// пунктир и полый маркер — до прогнозного значения. Прогноз визуально не
+// маскируется под факт.
+function forecastLineChart(el, {labels, values, forecastValue, yMin, yMax, height}){
+  height = height||220;
+  const W=680,H=height, padL=40,padR=16,padT=16,padB=28;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const n = labels.length+1; // + прогнозная точка
+  const xStep = plotW/(n-1);
+  const yScale = v => padT + plotH - ((v-yMin)/(yMax-yMin))*plotH;
+  let pts=[], circles='', axis='';
+  labels.forEach((lab,i)=>{
+    const x = padL+xStep*i, v = values[i];
+    axis += `<text x="${x.toFixed(1)}" y="${H-8}" font-size="10" text-anchor="middle" fill="#6C8A91">${escapeHtml(lab)}</text>`;
+    if(isNum(v)){ const y=yScale(v); pts.push([x,y]); circles += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="#123B47"><title>${escapeHtml(lab)}: ${v}</title></circle>`; }
+  });
+  const fx = padL+xStep*labels.length, fy = yScale(forecastValue);
+  axis += `<text x="${fx.toFixed(1)}" y="${H-8}" font-size="10" text-anchor="middle" fill="#2FA8C7">прогноз</text>`;
+  const solidPath = pts.length>1 ? `<path d="M ${pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L ')}" fill="none" stroke="#123B47" stroke-width="2"/>` : '';
+  const lastReal = pts[pts.length-1];
+  const dashPath = lastReal ? `<path d="M ${lastReal[0].toFixed(1)} ${lastReal[1].toFixed(1)} L ${fx.toFixed(1)} ${fy.toFixed(1)}" fill="none" stroke="#2FA8C7" stroke-width="2" stroke-dasharray="5,4"/>` : '';
+  const forecastMarker = `<circle cx="${fx.toFixed(1)}" cy="${fy.toFixed(1)}" r="6" fill="#fff" stroke="#2FA8C7" stroke-width="2.5"><title>прогноз (линейная экстраполяция): ${forecastValue}</title></circle>`;
+  const gridTop = `<line x1="${padL}" x2="${W-padR}" y1="${padT}" y2="${padT}" stroke="#E3F1F3"/>`;
+  const gridZero = yMin<0 && yMax>0 ? `<line x1="${padL}" x2="${W-padR}" y1="${yScale(0).toFixed(1)}" y2="${yScale(0).toFixed(1)}" stroke="#D5E6E9"/>` : '';
+  const yLabels = `<text x="2" y="${padT+4}" font-size="9" fill="#6C8A91">${yMax}</text><text x="2" y="${padT+plotH}" font-size="9" fill="#6C8A91">${yMin}</text>`;
+  el.innerHTML = svgWrap(W,H, gridTop+gridZero+solidPath+dashPath+circles+forecastMarker+axis+yLabels);
+}
+// Линейный график (тренд по годам / динамика клиента).
+function lineChart(el, {labels, values, yMin, yMax, pointColors, height}){
+  height = height||220;
+  const W=680,H=height, padL=40,padR=16,padT=16,padB=28;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const n=labels.length;
+  const xStep = n>1 ? plotW/(n-1) : 0;
+  const yScale = v => padT + plotH - ((v-yMin)/(yMax-yMin))*plotH;
+  let pts=[], circles='', axis='';
+  labels.forEach((lab,i)=>{
+    const x = padL + xStep*i;
+    const v = values[i];
+    axis += `<text x="${x.toFixed(1)}" y="${H-8}" font-size="10" text-anchor="middle" fill="#6C8A91">${escapeHtml(lab)}</text>`;
+    if(isNum(v)){
+      const y = yScale(v);
+      pts.push([x,y]);
+      const c = pointColors ? pointColors[i] : '#1D6E85';
+      circles += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${c}"><title>${escapeHtml(lab)}: ${v}</title></circle>`;
+    }
+  });
+  const path = pts.length>1 ? `<path d="M ${pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L ')}" fill="none" stroke="#1D6E85" stroke-width="2"/>` : '';
+  const gridTop = `<line x1="${padL}" x2="${W-padR}" y1="${padT}" y2="${padT}" stroke="#E7F3F5"/>`;
+  const gridBot = `<line x1="${padL}" x2="${W-padR}" y1="${padT+plotH}" y2="${padT+plotH}" stroke="#E7F3F5"/>`;
+  const yLabels = `<text x="2" y="${padT+4}" font-size="9" fill="#6C8A91">${yMax}</text><text x="2" y="${padT+plotH}" font-size="9" fill="#6C8A91">${yMin}</text>`;
+  el.innerHTML = svgWrap(W,H, gridTop+gridBot+path+circles+axis+yLabels);
+}
+// Составной (stacked) столбчатый график — структура промоутеры/нейтралы/детракторы.
+function stackedBarChart(el, {labels, series, height}){
+  height = height||220;
+  const W=680,H=height, padL=36,padR=10,padT=16,padB=28;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const totals = labels.map((_,i)=>series.reduce((s,se)=>s+(se.values[i]||0),0));
+  const maxTotal = Math.max(1,...totals);
+  const n=labels.length, gap=plotW/n, bw=Math.min(70,gap*0.55);
+  let bars='', axis='';
+  labels.forEach((lab,i)=>{
+    const x = padL+gap*i+(gap-bw)/2;
+    let yCursor = padT+plotH;
+    series.forEach(se=>{
+      const v = se.values[i]||0;
+      const h = v/maxTotal*plotH;
+      yCursor -= h;
+      bars += `<rect x="${x.toFixed(1)}" y="${yCursor.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" fill="${se.color}"><title>${escapeHtml(se.label)} ${escapeHtml(lab)}: ${v}</title></rect>`;
+    });
+    axis += `<text x="${(x+bw/2).toFixed(1)}" y="${H-8}" font-size="10" text-anchor="middle" fill="#6C8A91">${escapeHtml(lab)}</text>`;
+  });
+  const legend = series.map((se,i)=>`<rect x="${padL+i*110}" y="0" width="9" height="9" fill="${se.color}"/><text x="${padL+i*110+13}" y="8" font-size="9.5" fill="#47585C">${escapeHtml(se.label)}</text>`).join('');
+  el.innerHTML = svgWrap(W,H+16, `<g transform="translate(0,16)">${bars}${axis}</g>${legend}`);
+}
+// Пузырьковая матрица приоритетов (X — оценка, Y — связь с NPS, размер — n).
+function bubbleChart(el, {points, xMin,xMax,yMin,yMax,xLabel,yLabel,height}){
+  height = height||300;
+  const W=900,H=height, padL=54,padR=20,padT=16,padB=40;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const xScale = v => padL + (v-xMin)/(xMax-xMin)*plotW;
+  const yScale = v => padT + plotH - (v-yMin)/(yMax-yMin)*plotH;
+  const zeroY = yScale(0);
+  let dots='';
+  points.forEach(p=>{
+    const x=xScale(p.x), y=yScale(p.y), r=Math.min(22,4+Math.sqrt(p.n)*3);
+    dots += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="${p.color}" fill-opacity="0.72" stroke="${p.color}"><title>${escapeHtml(p.label)}: оценка ${p.x.toFixed(2)} (n=${p.n}), связь с NPS r=${p.y} (n=${p.ncorr})</title></circle>`;
+    dots += `<text x="${x.toFixed(1)}" y="${(y-r-4).toFixed(1)}" font-size="8.5" text-anchor="middle" fill="#47585C">${escapeHtml(shortLabel(p.label,14))}</text>`;
+  });
+  const axisX = `<line x1="${padL}" x2="${W-padR}" y1="${padT+plotH}" y2="${padT+plotH}" stroke="#B7D8DE"/><text x="${W/2}" y="${H-6}" font-size="10" text-anchor="middle" fill="#47585C">${escapeHtml(xLabel)}</text>`;
+  const axisY = `<line x1="${padL}" x2="${padL}" y1="${padT}" y2="${padT+plotH}" stroke="#B7D8DE"/><line x1="${padL}" x2="${W-padR}" y1="${zeroY.toFixed(1)}" y2="${zeroY.toFixed(1)}" stroke="#E7F3F5"/>`;
+  el.innerHTML = svgWrap(W,H, axisX+axisY+dots);
+}
+function buildHeatmap(el, rows){
+  const industries = Array.from(new Set(RAW_DATA.map(r=>r.industry))).filter(i=>i && i!=='ND').sort();
+  const drivers = DRIVERS.slice(0,13);
+  let html = `<table class="heat"><thead><tr><th></th>${industries.map(i=>`<th>${escapeHtml(shortLabel(i,14))}</th>`).join('')}</tr></thead><tbody>`;
+  drivers.forEach(d=>{
+    html += `<tr><th>${escapeHtml(d.label)}</th>`;
+    industries.forEach(ind=>{
+      const m = mean(rows.filter(r=>r.industry===ind), d.key);
+      if(m.value===null){ html += `<td><div class="heat-cell heat-na">н/д</div></td>`; }
+      else { const t=(m.value-1)/4; html += `<td title="n=${m.n}"><div class="heat-cell" style="background:${heatColor(t)};color:${t>0.55?'#fff':'#0F1B1F'}">${m.value.toFixed(1)}</div></td>`; }
+    });
+    html += `</tr>`;
+  });
+  html += `</tbody></table>`;
+  el.innerHTML = html;
+}
+function heatColor(t){
+  const stops=[[210,68,90],[185,130,14],[30,157,99]];
+  const seg = t<0.5 ? [stops[0],stops[1],t*2] : [stops[1],stops[2],(t-0.5)*2];
+  const c = seg[0].map((v,i)=>Math.round(v+(seg[1][i]-v)*seg[2]));
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+function miniHistHtml(dist){
+  const max=Math.max(1,...Object.values(dist));
+  return `<div class="mini-hist">${Object.entries(dist).map(([k,v])=>`<div class="bar" style="height:${v/max*100}%" title="${k}: ${v}"></div>`).join('')}</div>
+  <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--ink-faint);margin-top:3px;">${Object.keys(dist).map(k=>`<span>${k}</span>`).join('')}</div>`;
+}
+
+/* =========================================================================
+   СЕКЦИЯ 8. РЕНДЕРИНГ ТАБЛИЦ
+   ========================================================================= */
+function rowsTableHtml(rows, cols){
+  return `<table class="dt"><thead><tr>${cols.map(c=>`<th>${escapeHtml(c.label)}</th>`).join('')}</tr></thead>
+  <tbody>${rows.map(r=>`<tr>${cols.map(c=>`<td>${c.render(r)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+}
+function paginationHtml(page, totalPages, action){
+  return `<div class="pagination">
+    <button data-action="${action}" data-dir="prev" ${page<=0?'disabled':''}>← Назад</button>
+    <span>страница ${page+1} из ${totalPages}</span>
+    <button data-action="${action}" data-dir="next" ${page>=totalPages-1?'disabled':''}>Вперёд →</button>
+  </div>`;
+}
+function trackedTableHtml(tracked){
+  if(tracked.length===0) return `<div class="empty-state"><p>Нет клиентов, присутствующих в обеих волнах при текущих фильтрах.</p></div>`;
+  const rowsHtml = tracked.map(t=>{
+    const seg25=npsSegmentOf(t.row25.nps), seg26=npsSegmentOf(t.row26.nps), changed=seg25!==seg26;
+    return `<tr class="clickable" data-action="goto-client" data-client="${t.id}">
+      <td class="num">${t.id}</td><td>${escapeHtml(t.row25.country)||'—'}</td>
+      <td class="num">${t.row25.nps}</td><td class="num">${t.row26.nps}</td>
+      <td class="num">${t.deltaNps>0?'+':''}${t.deltaNps}</td>
+      <td>${changed?`<span class="tag tag-warn">${segRu(seg25)} → ${segRu(seg26)}</span>`:`<span class="tag tag-empty">сегмент не изменился</span>`}</td>
+      <td class="small-muted">«${escapeHtml((t.row25.npsComment||'').slice(0,50))}» → «${escapeHtml((t.row26.npsComment||'').slice(0,50))}»</td>
+    </tr>`;
+  }).join('');
+  return `<table class="dt"><thead><tr><th>ID</th><th>Страна</th><th>NPS 2025</th><th>NPS 2026</th><th>Δ</th><th>Сегмент</th><th>Комментарий 2025 → 2026</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
+}
+function segListHtml(list){
+  return list.map(g=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;">
+    <span>${escapeHtml(g.group)}</span><span class="num" style="color:${g.nps>=0?'var(--green)':'var(--red)'}">${g.nps} <span class="small-muted">(n=${g.n})</span></span></div>`).join('');
+}
+function segTableMini(rows){
+  if(rows.length===0) return `<p class="small-muted">Нет клиентов в этом сегменте при текущих фильтрах.</p>`;
+  return `<table class="dt"><thead><tr><th>ID</th><th>NPS</th><th>Страна</th></tr></thead><tbody>
+    ${rows.slice(0,10).map(r=>`<tr class="clickable" data-action="goto-client" data-client="${r.id}"><td class="num">${r.id}</td><td class="num">${r.nps}</td><td>${escapeHtml(r.country)||'—'}</td></tr>`).join('')}
+  </tbody></table>${rows.length>10?`<p class="small-muted">и ещё ${rows.length-10}…</p>`:''}`;
+}
+
+/* =========================================================================
+   СЕКЦИЯ 9. МОДАЛЬНЫЕ ОКНА
+   ========================================================================= */
+function openModal(title, bodyHtml){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = bodyHtml;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('show'); }
+function drillToRows(title, rows){
+  const cols = [
+    {label:'ID', render:r=>`<span class="num">${r.id}</span>`},
+    {label:'Год', render:r=>r.year},
+    {label:'Страна', render:r=>escapeHtml(r.country)||'—'},
+    {label:'Тир', render:r=>escapeHtml(r.tier)||'—'},
+    {label:'Отрасль', render:r=>escapeHtml(r.industry)||'—'},
+    {label:'Общ. удовл.', render:r=>isNum(r.sat)?r.sat:'н/д'},
+    {label:'NPS', render:r=>isNum(r.nps)?r.nps:'н/д'},
+  ];
+  openModal(title+` (n=${rows.length})`, rowsTableHtml(rows, cols));
+}
+
+/* =========================================================================
+   СЕКЦИЯ 10. ЭКСПОРТ
+   ========================================================================= */
+function exportCSV(filename, rows, cols){
+  const header = cols.map(c=>`"${c.label.replace(/"/g,'""')}"`).join(';');
+  const lines = rows.map(r=>cols.map(c=>`"${String(c.value(r)??'').replace(/"/g,'""')}"`).join(';'));
+  const csv = '\uFEFF'+[header,...lines].join('\r\n'); // BOM для корректной кириллицы в Excel
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Экспортировано: '+filename);
+}
+function showToast(msg, isErr){
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast'+(isErr?' err':'');
+  t.textContent = msg; // textContent — без риска разметки
+  c.appendChild(t);
+  setTimeout(()=>t.remove(), 2800);
+}
+
+/* =========================================================================
+   СЕКЦИЯ 11. ЭКРАНЫ ПРИЛОЖЕНИЯ
+   ========================================================================= */
+const NAV_ITEMS = [
+  {id:'overview', label:'Обзор компании', icon:iconGrid()},
+  {id:'clients', label:'Клиенты', icon:iconUsers()},
+  {id:'nps', label:'NPS и лояльность', icon:iconHeart()},
+  {id:'drivers', label:'Драйверы опыта', icon:iconSliders()},
+  {id:'comments', label:'Комментарии', icon:iconChat()},
+  {id:'comparison', label:'Сравнение периодов', icon:iconSwap()},
+  {id:'profile', label:'Цифровой профиль', icon:iconIdCard()},
+  {id:'sources', label:'Источники данных', icon:iconDb()},
+  {id:'future', label:'Будущие интеграции', icon:iconRocket()},
+];
+function iconGrid(){return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>`;}
+function iconUsers(){return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M15 20c0-2.7 1.8-5 4-5.6"/></svg>`;}
+function iconHeart(){return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7.5-4.6-10-9.3C.5 8 2.4 4.5 6 4.5c2 0 3.6 1.1 6 3.5 2.4-2.4 4-3.5 6-3.5 3.6 0 5.5 3.5 4 7.2C19.5 16.4 12 21 12 21z"/></svg>`;}
+function iconSliders(){return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="14" cy="6" r="2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="8" cy="12" r="2"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="16" cy="18" r="2"/></svg>`;}
+function iconChat(){return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a8 8 0 0 1-8 8H6l-3 3 .5-4.5A8 8 0 1 1 21 12z"/></svg>`;}
+function iconSwap(){return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>`;}
+function iconIdCard(){return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c0-1.7 1.3-3 3-3s3 1.3 3 3"/><line x1="14" y1="9" x2="18" y2="9"/><line x1="14" y1="13" x2="18" y2="13"/></svg>`;}
+function iconDb(){return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>`;}
+function iconRocket(){return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 4c3 1 6 4 6 8-3 0-6-1-8-3-2 2-3 5-3 8-2-1-3-3-3-5 0-4 3.5-8 8-8z"/><circle cx="15" cy="9" r="1.4"/><path d="M6 15c-2 1-3 4-3 4s3-1 4-3"/></svg>`;}
+
+function uniqueVals(key){ return Array.from(new Set(RAW_DATA.map(r=>r[key]).filter(v=>v!==null&&v!==undefined))).sort(); }
+
+function buildShellOnce(){
+  document.getElementById('sidebarNav').innerHTML = NAV_ITEMS.map(n=>`<div class="nav-item" data-action="nav" data-screen="${n.id}">${n.icon}<span>${escapeHtml(n.label)}</span></div>`).join('');
+  const countries=uniqueVals('country'), industries=uniqueVals('industry'), tiers=uniqueVals('tier');
+  document.getElementById('topbar').innerHTML = `
+    <span class="company">СИБУР</span>
+    <input type="text" id="globalSearch" data-action="global-search" placeholder="Поиск: ID клиента или текст комментария" value="${escapeHtml(appState.search)}">
+    <select id="fPeriod" data-action="filter-period">
+      <option value="2025">Период: 2025</option><option value="2026">Период: 2026</option><option value="both">Период: сравнение (оба)</option>
+    </select>
+    <select id="fCountry" data-action="filter-country"><option value="all">Страна: все</option>${countries.map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('')}</select>
+    <select id="fIndustry" data-action="filter-industry"><option value="all">Отрасль: все</option>${industries.map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('')}</select>
+    <select id="fTier" data-action="filter-tier"><option value="all">Тир: все</option>${tiers.map(c=>`<option value="${escapeHtml(c)}">Тир ${escapeHtml(c)}</option>`).join('')}</select>
+    <select id="fNps" data-action="filter-nps">
+      <option value="all">NPS-сегмент: все</option><option value="promoter">Промоутеры</option><option value="passive">Нейтралы</option><option value="detractor">Детракторы</option>
+    </select>
+    <button class="btn-reset" data-action="reset-filters">Сбросить фильтры</button>
+    <span class="samplesize" id="sampleSizeLabel">выборка: <b class="num">0</b> анкет</span>
+    <span class="importdate">данные встроены в файл · без сетевых запросов</span>
+  `;
+  syncTopbarControls();
+}
+function syncTopbarControls(){
+  document.getElementById('fPeriod').value = appState.period;
+  document.getElementById('fCountry').value = appState.country;
+  document.getElementById('fIndustry').value = appState.industry;
+  document.getElementById('fTier').value = appState.tier;
+  document.getElementById('fNps').value = appState.npsSegment;
+  updateSampleSize();
+}
+function updateSampleSize(){
+  const el = document.getElementById('sampleSizeLabel');
+  if(el) el.innerHTML = `выборка: <b class="num">${getFilteredRows().length}</b> анкет`;
+}
+function updateSidebarActive(){
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active', el.dataset.screen===appState.screen));
+}
+function render(){ updateSidebarActive(); renderScreen(); }
+function renderScreen(){
+  const map = {overview:renderOverview, clients:renderClients, nps:renderNpsLoyalty, drivers:renderDrivers,
+    comments:renderComments, comparison:renderComparison, profile:renderProfile, sources:renderSources, future:renderFuture};
+  const target = document.getElementById('main-content');
+  try{
+    target.innerHTML='';
+    (map[appState.screen]||renderOverview)();
+  }catch(e){
+    console.error('[spectra] render error', e);
+    target.innerHTML = `<div class="empty-state"><h4>Не удалось отрисовать раздел</h4><p>Произошла ошибка интерфейса: ${escapeHtml(e.message)}. Остальная навигация продолжает работать — попробуйте выбрать другой раздел или сбросить фильтры.</p></div>`;
+  }
+  updateSampleSize();
+}
+
+/* ---- 11.1 ОБЗОР КОМПАНИИ ---- */
+function renderOverview(){
+  const rows = getFilteredRows();
+  const nps = npsCalc(rows), sat = mean(rows,'sat'), rec = mean(rows,'nps');
+  const uniqueIds = new Set(rows.map(r=>r.id)).size;
+  const tracked = getTrackedClients();
+  const other = appState.period==='2025' ? npsCalc(applyGlobalFilters(getYearRows(2026))) : (appState.period==='2026' ? npsCalc(applyGlobalFilters(getYearRows(2025))) : null);
+
+  const forecast = computeNpsForecast();
+  const insights = buildExecutiveInsights(rows);
+  const watchlist = computeRiskWatchlist(rows, 8);
+  const partnershipIdx = computePartnershipIndex(rows);
+
+  document.getElementById('main-content').innerHTML = `
+  <div class="hero-brand">
+    <div>
+      <div class="eyebrow">Прогноз NPS · предиктивная оценка</div>
+      <h1>${forecast ? `NPS прошёл путь <span class="num">${forecast.n25} → ${forecast.n26}</span> и по тренду двух волн может достичь <span class="num">${forecast.forecast}</span> на следующей волне` : 'Недостаточно данных для прогноза NPS при текущих фильтрах'}</h1>
+      <p class="hero-caveat">Это простая линейная экстраполяция по двум фактическим точкам (2025→2026), а не статистически надёжный прогноз — точность оценки вырастет по мере накопления новых волн замера. Число показано, чтобы обозначить направление тренда, а не как гарантированный результат.</p>
+    </div>
+    <div class="hero-side">
+      <div class="card-title">Что показывают данные</div>
+      <ul class="insight-list">${insights.length? insights.map(i=>`<li>${escapeHtml(i)}</li>`).join('') : '<li>Недостаточно данных при текущих фильтрах для содержательных выводов.</li>'}</ul>
+    </div>
+  </div>
+  <div class="integrity-strip">Все показатели рассчитаны напрямую из строк загруженной выгрузки. Пустые ячейки не подставляются нулями. Каналы без данных не моделируются.</div>
+  <h2 class="section-title">Пульс клиентского опыта</h2>
+  <div class="grid grid-4" style="margin-bottom:14px;">
+    ${kpiCard(nps.nps===null?'—':nps.nps, 'NPS ('+periodLabel()+')', nps.n, other?deltaTag(fmtDelta(nps.nps,other.nps,1)):'', 'nps')}
+    ${kpiCard(rec.value===null?'—':rec.value.toFixed(2), 'Средняя готовность рекомендовать (0–10)', rec.n)}
+    ${kpiCard(sat.value===null?'—':sat.value.toFixed(2), 'Средняя общая удовлетворённость (1–5)', sat.n)}
+    ${kpiCard(uniqueIds, 'Уникальных клиентов в выборке', undefined)}
+  </div>
+  <div class="grid grid-4" style="margin-bottom:20px;">
+    ${kpiCard(nps.promoterPct+'%','Доля промоутеров', nps.promoters, '', 'promoter')}
+    ${kpiCard(nps.passivePct+'%','Доля нейтралов', nps.passives, '', 'passive')}
+    ${kpiCard(nps.detractorPct+'%','Доля детракторов', nps.detractors, '', 'detractor')}
+    ${kpiCard(watchlist.filter(w=>w.risk.level==='высокий').length, 'Клиентов с высоким риском оттока', undefined)}
+  </div>
+  <div class="grid grid-4" style="margin-bottom:20px;">
+    ${kpiSmall(mean(rows,'manager'),'Менеджер')}${kpiSmall(mean(rows,'orderSupport'),'Сопровождение заказа')}
+    ${kpiSmall(mean(rows,'quality'),'Качество продукции')}${kpiSmall(mean(rows,'price'),'Цена')}
+  </div>
+  <div class="grid grid-4" style="margin-bottom:20px;">
+    ${kpiCard(partnershipIdx.value===null?'—':partnershipIdx.value.toFixed(2), 'Индекс партнёрства (5 вопросов, 1–5)', partnershipIdx.n)}
+    ${kpiCard(tracked.length, 'Клиентов в обеих волнах (2025 и 2026)', undefined)}
+    ${kpiCard(watchlist.filter(w=>w.risk.level==='средний').length, 'Клиентов со средним риском', undefined)}
+    ${kpiCard(forecast?forecast.forecast:'—', 'Прогноз NPS на следующую волну', undefined)}
+  </div>
+  <div class="grid grid-2" style="margin-bottom:14px;">
+    <div class="card"><div class="card-title">NPS: 2025 → 2026 → прогноз</div><div class="card-sub">сплошная линия — факт, пунктир — линейная экстраполяция <span class="tag tag-real">выгрузка Excel</span></div><div class="chart-box" id="chOvNpsTrend"></div></div>
+    <div class="card"><div class="card-title">Структура: промоутеры / нейтралы / детракторы</div><div class="card-sub">по годам</div><div class="chart-box" id="chOvStructure"></div></div>
+  </div>
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title">Клиенты в зоне риска</div>
+    <div class="card-sub">прозрачная rule-based оценка (0–100) по факту: сегмент NPS, динамика год-к-году, низкие оценки цены/менеджера/техсервиса, темы комментариев — не «чёрный ящик»: наведите на клиента, чтобы увидеть причины</div>
+    ${watchlist.length ? watchlist.map(w=>`
+      <div class="risk-item">
+        <span class="tag ${w.risk.level==='высокий'?'tag-warn':'tag-empty'}" style="cursor:pointer;" data-action="goto-client" data-client="${w.row.id}">ID ${w.row.id}</span>
+        <div><div class="risk-bar-track"><div class="risk-bar-fill" style="width:${w.risk.score}%;background:${w.risk.level==='высокий'?'var(--red)':w.risk.level==='средний'?'var(--yellow)':'var(--green)'}"></div></div>
+          <div class="small-muted" style="margin-top:3px;" title="${escapeHtml(w.risk.reasons.map(r=>r.text+' ('+(r.pts>0?'+':'')+r.pts+')').join('; '))}">${escapeHtml(w.risk.reasons.slice(0,2).map(r=>r.text).join('; '))}${w.risk.reasons.length>2?'…':''}</div></div>
+        <span class="num risk-score-${w.risk.level==='высокий'?'high':w.risk.level==='средний'?'mid':'low'}">${w.risk.score} · ${w.risk.level}</span>
+      </div>`).join('') : '<p class="small-muted">Нет клиентов при текущих фильтрах.</p>'}
+  </div>
+  <div class="grid grid-2" style="margin-bottom:14px;">
+    <div class="card"><div class="card-title">Средняя общая удовлетворённость по годам</div><div class="chart-box" id="chOvSat"></div></div>
+    <div class="card"><div class="card-title">Средние оценки по ключевым этапам взаимодействия</div><div class="card-sub">${escapeHtml(periodLabel())}</div><div class="chart-box" id="chOvDrivers"></div></div>
+  </div>
+  <div class="grid grid-3" style="margin-bottom:14px;">
+    <div class="card"><div class="card-title">NPS по странам</div><div class="chart-box" id="chOvCountry"></div></div>
+    <div class="card"><div class="card-title">NPS по отраслям</div><div class="chart-box" id="chOvIndustry"></div></div>
+    <div class="card"><div class="card-title">NPS по тиру клиента</div><div class="chart-box" id="chOvTier"></div></div>
+  </div>
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title">Тепловая карта: средняя оценка параметра × отрасль</div>
+    <div class="card-sub">${escapeHtml(periodLabel())} · цвет отражает среднюю фактическую оценку 1–5, штриховка — нет ответов</div>
+    <div id="ovHeatmap" style="overflow:auto;"></div>
+  </div>
+  <div class="grid grid-2" style="margin-bottom:14px;">
+    <div class="card"><div class="card-title">Распределение оценок 1–5 по параметру</div>
+      <select id="ovHistPick" data-action="ov-hist-pick">${DRIVERS.map(d=>`<option value="${d.key}" ${appState.driverPickHist===d.key?'selected':''}>${escapeHtml(d.label)}</option>`).join('')}</select>
+      <div class="chart-box" id="chOvHist" style="margin-top:10px;"></div></div>
+    <div class="card"><div class="card-title">Комментарии по темам</div><div class="card-sub">автоматическая классификация по ключевым словам</div><div class="chart-box" id="chOvThemes"></div></div>
+  </div>
+  <div class="card" style="margin-bottom:14px;"><div class="card-title">Средний NPS клиентов, упоминающих тему в комментарии</div><div id="ovThemeNpsTable"></div></div>
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title">Матрица приоритетов драйверов</div>
+    <div class="card-sub">ось X — средняя оценка параметра, ось Y — статистическая связь с NPS (корреляция Пирсона), размер точки — число ответов. Причинно-следственная связь не утверждается.</div>
+    <div class="chart-box" id="chOvMatrix" style="min-height:300px;"></div>
+  </div>
+  <div class="card"><div class="card-title">Динамика клиентов, присутствующих в обеих волнах</div><div class="card-sub">единственные клиенты пилота с реальным сравнением год-к-году (n=${tracked.length})</div>${trackedTableHtml(tracked)}</div>
+  `;
+
+  safeDraw('chOvNpsTrend', el=>{
+    const r25=applyGlobalFilters(getYearRows(2025)), r26=applyGlobalFilters(getYearRows(2026));
+    const n25=npsCalc(r25), n26=npsCalc(r26);
+    if(n25.nps!==null && n26.nps!==null){
+      const delta = n26.nps-n25.nps, fc = Math.round((n26.nps+delta)*10)/10;
+      forecastLineChart(el, {labels:['2025','2026'], values:[n25.nps,n26.nps], forecastValue:fc, yMin:-100, yMax:30});
+    } else {
+      lineChart(el, {labels:['2025','2026'], values:[n25.nps,n26.nps], yMin:-100, yMax:20, pointColors:['#D2445A','#D2445A']});
+    }
+  });
+  safeDraw('chOvStructure', el=>{
+    const r25=applyGlobalFilters(getYearRows(2025)), r26=applyGlobalFilters(getYearRows(2026));
+    const n25=npsCalc(r25), n26=npsCalc(r26);
+    stackedBarChart(el, {labels:['2025','2026'], series:[
+      {label:'Промоутеры', color:'#1E9D63', values:[n25.promoters,n26.promoters]},
+      {label:'Нейтралы', color:'#B9820E', values:[n25.passives,n26.passives]},
+      {label:'Детракторы', color:'#D2445A', values:[n25.detractors,n26.detractors]}]});
+  });
+  safeDraw('chOvSat', el=>{
+    const r25=applyGlobalFilters(getYearRows(2025)), r26=applyGlobalFilters(getYearRows(2026));
+    const s25=mean(r25,'sat'), s26=mean(r26,'sat');
+    barChart(el, {labels:['2025 (n='+s25.n+')','2026 (n='+s26.n+')'], values:[s25.value,s26.value], yMin:0, yMax:5, colors:['#1D6E85','#1D6E85']});
+  });
+  safeDraw('chOvDrivers', el=>{
+    const entries = DRIVERS.map(d=>({label:d.label, ...mean(rows,d.key)})).filter(d=>d.n>0).sort((a,b)=>a.value-b.value);
+    hBarChart(el, {labels:entries.map(d=>d.label+' (n='+d.n+')'), values:entries.map(d=>d.value), max:5, valueFmt:v=>v.toFixed(2)});
+  });
+  safeDraw('chOvCountry', el=>{ const g=segmentedNps(rows,'country'); barChart(el, {labels:g.map(x=>x.group+' (n='+x.n+')'), values:g.map(x=>x.nps), yMin:-100, yMax:100, colors:g.map(x=>x.nps>=0?'#1E9D63':'#D2445A')}); });
+  safeDraw('chOvIndustry', el=>{ const g=segmentedNps(rows,'industry'); barChart(el, {labels:g.map(x=>x.group+' (n='+x.n+')'), values:g.map(x=>x.nps), yMin:-100, yMax:100, colors:g.map(x=>x.nps>=0?'#1E9D63':'#D2445A')}); });
+  safeDraw('chOvTier', el=>{ const g=segmentedNps(rows,'tier'); barChart(el, {labels:g.map(x=>'Тир '+x.group+' (n='+x.n+')'), values:g.map(x=>x.nps), yMin:-100, yMax:100, colors:g.map(x=>x.nps>=0?'#1E9D63':'#D2445A')}); });
+  safeDraw('ovHeatmap', el=>buildHeatmap(el, rows));
+  safeDraw('chOvHist', el=>{ const dist=distribution(rows, appState.driverPickHist, 1, 5); barChart(el, {labels:Object.keys(dist), values:Object.values(dist), yMin:0, yMax:Math.max(1,...Object.values(dist)), colors:Object.keys(dist).map(()=>'#1D6E85')}); });
+  safeDraw('chOvThemes', el=>{
+    const themeCounts={};
+    rows.forEach(r=>{ DRIVERS.forEach(d=>{ if(d.commentKey&&r[d.commentKey]){ const th=classifyTheme(r[d.commentKey]); themeCounts[th]=(themeCounts[th]||0)+1; }}); if(r.npsComment){ const th=classifyTheme(r.npsComment); themeCounts[th]=(themeCounts[th]||0)+1; } });
+    const entries=Object.entries(themeCounts).sort((a,b)=>b[1]-a[1]);
+    hBarChart(el, {labels:entries.map(e=>e[0]), values:entries.map(e=>e[1])});
+  });
+  safeDraw('ovThemeNpsTable', el=>{
+    const themeCounts={};
+    rows.forEach(r=>{ DRIVERS.forEach(d=>{ if(d.commentKey&&r[d.commentKey]){ const th=classifyTheme(r[d.commentKey]); themeCounts[th]=(themeCounts[th]||0)+1; }}); if(r.npsComment){ const th=classifyTheme(r.npsComment); themeCounts[th]=(themeCounts[th]||0)+1; } });
+    const themes = Object.keys(themeCounts).sort((a,b)=>themeCounts[b]-themeCounts[a]);
+    const themeNpsRows = themes.map(theme=>{
+      const matched = rows.filter(r=> DRIVERS.some(d=>d.commentKey&&r[d.commentKey]&&classifyTheme(r[d.commentKey])===theme) || (r.npsComment&&classifyTheme(r.npsComment)===theme));
+      const n = npsCalc(matched);
+      return {theme, nps:n.nps, n:n.n};
+    });
+    el.innerHTML = `<table class="dt"><thead><tr><th>Тема (авто)</th><th>Средний NPS клиентов</th><th>n</th></tr></thead><tbody>
+      ${themeNpsRows.map(t=>`<tr><td>${escapeHtml(t.theme)}</td><td class="num">${t.nps===null?'—':t.nps}</td><td class="num">${t.n} ${smallSampleWarning(t.n)}</td></tr>`).join('')}
+    </tbody></table>`;
+  });
+  safeDraw('chOvMatrix', el=>{
+    const matrixData = DRIVERS.map(d=>{ const m=mean(rows,d.key), c=pearson(rows,d.key,'nps'); return {label:d.label, x:m.value, y:c.r, n:m.n, ncorr:c.n}; }).filter(d=>d.x!==null&&d.y!==null);
+    const points = matrixData.map(d=>({x:d.x,y:d.y,n:d.n,ncorr:d.ncorr,label:d.label,
+      color: d.ncorr<MIN_N_RELIABLE ? '#6C8A91' : (d.x<3.8 && Math.abs(d.y)>=0.5 ? '#D2445A' : (d.x>=3.8 && Math.abs(d.y)>=0.5 ? '#1E9D63' : '#1D6E85'))}));
+    bubbleChart(el, {points, xMin:1,xMax:5, yMin:-1,yMax:1, xLabel:'Средняя оценка', yLabel:'Корреляция с NPS'});
+  });
+
+  updateSampleSize();
+}
+
+/* ---- 11.2 КЛИЕНТЫ ---- */
+function renderClients(){
+  let rows = getFilteredRows();
+  if(appState.clientsMode==='unique') rows = uniqueClientRows(rows);
+  rows = applyClientsPreset(rows);
+  rows = sortRows(rows, appState.clientsSort.key, appState.clientsSort.dir, appState.clientsSort.key!=='country'&&appState.clientsSort.key!=='industry');
+  const pg = paginate(rows, appState.clientsPage, 15);
+  appState.clientsPage = pg.page;
+
+  const presets = [['none','Все'],['detractors','Детракторы'],['promoters','Промоутеры'],['managerLow','Менеджер ≤ 2'],['priceLow','Цена ≤ 2'],
+    ['qualityLow','Качество ≤ 2'],['negComments','С негативными комментариями'],['tracked','В обеих волнах'],['npsUp','Рост NPS'],['npsDown','Снижение NPS']];
+  document.getElementById('main-content').innerHTML = `
+    <h2 class="section-title">Клиенты</h2>
+    <div class="table-toolbar">
+      <div class="chip-toggle"><button data-action="clients-mode" data-mode="all" class="${appState.clientsMode==='all'?'active':''}">Все ответы</button>
+      <button data-action="clients-mode" data-mode="unique" class="${appState.clientsMode==='unique'?'active':''}">Уникальные клиенты</button></div>
+      <button class="btn" data-action="export-clients">Экспорт CSV</button>
+      <span class="small-muted">n=${rows.length}</span>
+    </div>
+    <div class="preset-row">${presets.map(([k,l])=>`<button class="preset-btn ${appState.clientsPreset===k?'active':''}" data-action="clients-preset" data-preset="${k}">${escapeHtml(l)}</button>`).join('')}</div>
+    <div class="card" style="padding:0;">${clientsTableHtml(pg.slice)}${paginationHtml(pg.page,pg.totalPages,'clients-page')}</div>
+  `;
+}
+function clientsTableHtml(rows){
+  const trackedIds = new Set(getTrackedClients().map(t=>t.id));
+  const sortInd = k=> appState.clientsSort.key===k ? (appState.clientsSort.dir==='desc'?'sorted':'sorted-asc') : '';
+  const head = `<tr>
+    <th data-action="clients-sort" data-sort="id" class="${sortInd('id')}">ID</th>
+    <th data-action="clients-sort" data-sort="country" class="${sortInd('country')}">Страна</th>
+    <th data-action="clients-sort" data-sort="tier" class="${sortInd('tier')}">Тир</th>
+    <th data-action="clients-sort" data-sort="industry" class="${sortInd('industry')}">Отрасль</th>
+    <th data-action="clients-sort" data-sort="year" class="${sortInd('year')}">Год</th>
+    <th data-action="clients-sort" data-sort="sat" class="${sortInd('sat')}">Удовл.</th>
+    <th data-action="clients-sort" data-sort="nps" class="${sortInd('nps')}">NPS</th>
+    <th>Сегмент</th><th>Комментариев</th><th>Темы</th><th>Обе волны</th></tr>`;
+  const body = rows.map(r=>{
+    const commentCount = DRIVERS.filter(d=>d.commentKey&&r[d.commentKey]).length + (r.npsComment?1:0);
+    const themes = new Set(); DRIVERS.forEach(d=>{ if(d.commentKey&&r[d.commentKey]) themes.add(classifyTheme(r[d.commentKey])); }); if(r.npsComment) themes.add(classifyTheme(r.npsComment));
+    const seg = npsSegmentOf(r.nps);
+    return `<tr class="clickable" data-action="goto-client" data-client="${r.id}">
+      <td class="num">${r.id}</td><td>${escapeHtml(r.country)||'—'}</td><td>${escapeHtml(r.tier)||'—'}</td><td>${escapeHtml(r.industry)||'—'}</td>
+      <td>${r.year}</td><td class="num">${isNum(r.sat)?r.sat:'н/д'}</td><td class="num">${isNum(r.nps)?r.nps:'н/д'}</td>
+      <td>${seg?`<span class="pill pill-${seg}">${segRu(seg)}</span>`:'—'}</td>
+      <td class="num">${commentCount}</td><td class="small-muted">${escapeHtml(Array.from(themes).slice(0,2).join(', '))||'—'}</td>
+      <td>${trackedIds.has(r.id)?'<span class="tag tag-real">да</span>':'<span class="tag tag-empty">нет</span>'}</td></tr>`;
+  }).join('');
+  return `<table class="dt"><thead>${head}</thead><tbody>${body}</tbody></table>`;
+}
+
+/* ---- 11.3 NPS И ЛОЯЛЬНОСТЬ ---- */
+function renderNpsLoyalty(){
+  const rows = getFilteredRows(), nps = npsCalc(rows), tracked = getTrackedClients();
+  const changed = tracked.filter(t=>npsSegmentOf(t.row25.nps)!==npsSegmentOf(t.row26.nps));
+  document.getElementById('main-content').innerHTML = `
+  <h2 class="section-title">NPS и лояльность</h2>
+  <div class="grid grid-4" style="margin-bottom:16px;">
+    ${kpiCard(nps.nps===null?'—':nps.nps,'Текущий NPS ('+periodLabel()+')',nps.n)}
+    ${kpiCard(nps.promoterPct+'%','Промоутеры (9–10)',nps.promoters)}
+    ${kpiCard(nps.passivePct+'%','Нейтралы (7–8)',nps.passives)}
+    ${kpiCard(nps.detractorPct+'%','Детракторы (0–6)',nps.detractors)}
+  </div>
+  <div class="grid grid-2" style="margin-bottom:16px;">
+    <div class="card"><div class="card-title">Распределение NPS-оценок (0–10)</div><div class="chart-box" id="chNpsDist"></div></div>
+    <div class="card"><div class="card-title">NPS по годам</div><div class="chart-box" id="chNpsYears"></div></div>
+  </div>
+  <div class="grid grid-3" style="margin-bottom:16px;">
+    <div class="card"><div class="card-title">NPS по странам</div><div id="npsByCountry"></div></div>
+    <div class="card"><div class="card-title">NPS по отраслям</div><div id="npsByIndustry"></div></div>
+    <div class="card"><div class="card-title">NPS по тиру</div><div id="npsByTier"></div></div>
+  </div>
+  <div class="grid grid-3" style="margin-bottom:16px;">
+    <div class="card"><div class="card-title">Промоутеры</div>${segTableMini(rows.filter(r=>npsSegmentOf(r.nps)==='promoter'))}</div>
+    <div class="card"><div class="card-title">Нейтралы</div>${segTableMini(rows.filter(r=>npsSegmentOf(r.nps)==='passive'))}</div>
+    <div class="card"><div class="card-title">Детракторы</div>${segTableMini(rows.filter(r=>npsSegmentOf(r.nps)==='detractor'))}</div>
+  </div>
+  <div class="card" style="margin-bottom:16px;"><div class="card-title">Комментарии к готовности рекомендовать</div>
+    <div>${rows.filter(r=>r.npsComment).slice(0,12).map(r=>`<div class="comment-row"><div class="comment-top"><span class="num">ID ${r.id}</span><span class="pill pill-${npsSegmentOf(r.nps)}">${r.nps}</span><span class="comment-meta">${r.year}</span></div><div class="comment-text">«${escapeHtml(r.npsComment)}»</div></div>`).join('')}</div></div>
+  <div class="card"><div class="card-title">Клиенты со сменой NPS-сегмента</div><div class="card-sub">по клиентам, присутствующим в обеих волнах (n=${tracked.length}); сменили сегмент: ${changed.length}</div>${trackedTableHtml(tracked)}</div>
+  `;
+  safeDraw('chNpsDist', el=>{ const dist=distribution(rows,'nps',0,10); barChart(el, {labels:Object.keys(dist), values:Object.values(dist), yMin:0, yMax:Math.max(1,...Object.values(dist)), colors:Object.keys(dist).map(k=>k>=9?'#1E9D63':k>=7?'#B9820E':'#D2445A')}); });
+  safeDraw('chNpsYears', el=>{ const r25=applyGlobalFilters(getYearRows(2025)), r26=applyGlobalFilters(getYearRows(2026)); const n25=npsCalc(r25), n26=npsCalc(r26);
+    barChart(el, {labels:['2025 (n='+n25.n+')','2026 (n='+n26.n+')'], values:[n25.nps,n26.nps], yMin:-100, yMax:20, colors:['#1D6E85','#123B47']}); });
+  safeDraw('npsByCountry', el=>{ el.innerHTML = segListHtml(segmentedNps(rows,'country')); });
+  safeDraw('npsByIndustry', el=>{ el.innerHTML = segListHtml(segmentedNps(rows,'industry')); });
+  safeDraw('npsByTier', el=>{ el.innerHTML = segListHtml(segmentedNps(rows,'tier')); });
+}
+
+/* ---- 11.4 ДРАЙВЕРЫ ОПЫТА ---- */
+function renderDrivers(){
+  const rows = getFilteredRows();
+  let html = `<h2 class="section-title">Драйверы опыта</h2>
+    <p class="small-muted" style="margin-bottom:14px;">Показатель связи — коэффициент корреляции Пирсона с NPS-оценкой клиента. Это статистическая связь, а не доказанная причинно-следственная зависимость.</p>`;
+  DRIVERS.forEach(d=>{
+    const m=mean(rows,d.key), med=median(rows,d.key), corr=pearson(rows,d.key,'nps');
+    if(m.n===0 && corr.n===0) return;
+    const byIndustry = segmentedNpsGeneric(rows,'industry',d.key);
+    const posComments = d.commentKey ? rows.filter(r=>isNum(r[d.key])&&r[d.key]>=4&&r[d.commentKey]).slice(0,2) : [];
+    const negComments = d.commentKey ? rows.filter(r=>isNum(r[d.key])&&r[d.key]<=2&&r[d.commentKey]).slice(0,2) : [];
+    html += `<div class="driver-block">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;">
+        <h3 style="font-size:13.5px;">${escapeHtml(d.label)}</h3>
+        <div style="display:flex;gap:14px;align-items:center;">
+          <span class="small-muted">среднее <b class="num">${m.value===null?'н/д':m.value.toFixed(2)}</b> (n=${m.n})</span>
+          <span class="small-muted">медиана <b class="num">${med.value===null?'н/д':med.value}</b></span>
+          <span class="small-muted">связь с NPS <b class="num">${corr.r===null?'н/д':corr.r}</b> (n=${corr.n})</span>
+          ${corr.n>0?smallSampleWarning(corr.n):''}
+        </div>
+      </div>
+      <div class="grid grid-3" style="margin-top:10px;">
+        <div><div class="small-muted" style="margin-bottom:5px;">Распределение оценок</div>${miniHistHtml(distribution(rows,d.key,1,5))}</div>
+        <div><div class="small-muted" style="margin-bottom:5px;">Мин/макс по отраслям</div>
+          ${byIndustry.length?`<div class="small-muted">Минимум: ${escapeHtml(byIndustry[byIndustry.length-1].group)} (${byIndustry[byIndustry.length-1].value.toFixed(2)})</div><div class="small-muted">Максимум: ${escapeHtml(byIndustry[0].group)} (${byIndustry[0].value.toFixed(2)})</div>`:'<div class="small-muted">н/д</div>'}</div>
+        <div><div class="small-muted" style="margin-bottom:5px;">Реальные комментарии</div>
+          ${posComments.map(r=>`<div class="comment-text" style="color:var(--green);font-size:11px;">+ «${escapeHtml((r[d.commentKey]||'').slice(0,80))}»</div>`).join('')}
+          ${negComments.map(r=>`<div class="comment-text" style="color:var(--red);font-size:11px;">− «${escapeHtml((r[d.commentKey]||'').slice(0,80))}»</div>`).join('')}
+          ${(posComments.length+negComments.length)===0?'<span class="small-muted">нет подходящих комментариев</span>':''}
+        </div>
+      </div></div>`;
+  });
+  document.getElementById('main-content').innerHTML = html;
+}
+
+/* ---- 11.5 КОММЕНТАРИИ ---- */
+function renderComments(){
+  const rows = getFilteredRows();
+  let feed = buildCommentsFeed(rows);
+  if(appState.commentsSearch) feed = feed.filter(c=>c.text.toLowerCase().includes(appState.commentsSearch.toLowerCase())||String(c.id).includes(appState.commentsSearch));
+  if(appState.commentsTheme!=='all') feed = feed.filter(c=>c.theme===appState.commentsTheme);
+  feed = sortRows(feed, appState.commentsSort.key, appState.commentsSort.dir, appState.commentsSort.key==='score'||appState.commentsSort.key==='nps'||appState.commentsSort.key==='id'||appState.commentsSort.key==='year_');
+  const pg = paginate(feed, appState.commentsPage, 20);
+  appState.commentsPage = pg.page;
+  const themes = Array.from(new Set(buildCommentsFeed(getFilteredRows()).map(c=>c.theme))).sort();
+
+  document.getElementById('main-content').innerHTML = `
+  <h2 class="section-title">Комментарии</h2>
+  <div class="table-toolbar">
+    <input type="text" id="commentsSearchInput" data-action="comments-search" placeholder="Поиск по тексту или ID" value="${escapeHtml(appState.commentsSearch)}">
+    <select data-action="comments-theme"><option value="all">Тема: все</option>${themes.map(t=>`<option value="${escapeHtml(t)}" ${appState.commentsTheme===t?'selected':''}>${escapeHtml(t)}</option>`).join('')}</select>
+    <select data-action="comments-sort">
+      <option value="year_" ${appState.commentsSort.key==='year_'?'selected':''}>Сортировка: год</option>
+      <option value="score" ${appState.commentsSort.key==='score'?'selected':''}>Сортировка: оценка показателя</option>
+      <option value="nps" ${appState.commentsSort.key==='nps'?'selected':''}>Сортировка: NPS клиента</option>
+      <option value="theme" ${appState.commentsSort.key==='theme'?'selected':''}>Сортировка: тема</option>
+    </select>
+    <button class="btn" data-action="export-comments">Экспорт CSV</button>
+    <span class="small-muted">n=${feed.length}</span>
+  </div>
+  <p class="small-muted" style="margin-bottom:10px;">Тема и тональность определяются автоматически (по ключевым словам и по числовой оценке соответствующего показателя) и помечены как алгоритмические — это не заявление клиента, а классификация системы.</p>
+  <div class="card">${pg.slice.map(c=>`
+    <div class="comment-row">
+      <div class="comment-top">
+        <span class="num">ID ${c.id}</span><span class="comment-meta">${c.year_}</span>
+        <span class="comment-meta">${escapeHtml(c.country)||'—'} · ${escapeHtml(c.tier)||'—'} · ${escapeHtml(c.industry)||'—'}</span>
+        <span class="tag tag-real">${escapeHtml(c.metric)}${isNum(c.score)?': '+c.score:''}</span>
+        <span class="pill pill-${c.seg||'passive'}">${c.seg?segRu(c.seg):'нет NPS'}</span>
+        <span class="tag tag-empty">тема (авто): ${escapeHtml(c.theme)}</span>
+        <span class="kpi-delta ${c.tone.cls}">тональность (алгоритм.): ${escapeHtml(c.tone.label)}</span>
+      </div>
+      <div class="comment-text">«${escapeHtml(c.text)}»</div>
+    </div>`).join('')}
+  ${paginationHtml(pg.page,pg.totalPages,'comments-page')}
+  </div>
+  `;
+}
+
+/* ---- 11.6 СРАВНЕНИЕ ПЕРИОДОВ ---- */
+function renderComparison(){
+  const tracked = getTrackedClients();
+  const allR25=applyGlobalFilters(getYearRows(2025)), allR26=applyGlobalFilters(getYearRows(2026));
+  const trR25=tracked.map(t=>t.row25), trR26=tracked.map(t=>t.row26);
+  const use25 = appState.comparisonMode==='tracked'?trR25:allR25, use26 = appState.comparisonMode==='tracked'?trR26:allR26;
+  const n25=npsCalc(use25), n26=npsCalc(use26), s25=mean(use25,'sat'), s26=mean(use26,'sat'), rec25=mean(use25,'nps'), rec26=mean(use26,'nps');
+  const driverDeltas = DRIVERS.map(d=>{ const m25=mean(use25,d.key), m26=mean(use26,d.key); if(m25.value===null||m26.value===null) return null;
+    return {label:d.label, v25:m25.value, v26:m26.value, delta:Math.round((m26.value-m25.value)*100)/100, n25:m25.n, n26:m26.n}; }).filter(Boolean).sort((a,b)=>b.delta-a.delta);
+  const themeCounts = rowsArg=>{ const c={}; buildCommentsFeed(rowsArg).forEach(cm=>{c[cm.theme]=(c[cm.theme]||0)+1;}); return c; };
+  const th25=themeCounts(use25), th26=themeCounts(use26);
+  const allThemes = Array.from(new Set([...Object.keys(th25),...Object.keys(th26)]));
+
+  document.getElementById('main-content').innerHTML = `
+  <h2 class="section-title">Сравнение периодов: 2025 vs 2026</h2>
+  <div class="chip-toggle" style="margin-bottom:14px;">
+    <button data-action="comparison-mode" data-mode="all" class="${appState.comparisonMode==='all'?'active':''}">Вся выборка</button>
+    <button data-action="comparison-mode" data-mode="tracked" class="${appState.comparisonMode==='tracked'?'active':''}">Сопоставимые клиенты (n=${tracked.length})</button>
+  </div>
+  ${appState.comparisonMode==='all'?`<div class="integrity-strip">Режим «Вся выборка» сравнивает всех респондентов каждого года. Изменение может отражать не только смену отношения клиентов, но и смену состава респондентов (2025: 26 анкет, 2026: 26 анкет, из них лишь ${tracked.length} — одни и те же клиенты).</div>`:''}
+  <div class="grid grid-3" style="margin-bottom:16px;">
+    <div class="card"><div class="card-title">NPS</div><span class="num" style="font-size:20px;">${n25.nps} → ${n26.nps}</span> ${deltaTag(fmtDelta(n26.nps,n25.nps,1))}<div class="kpi-n">n=${n25.n} → n=${n26.n}</div></div>
+    <div class="card"><div class="card-title">Готовность рекомендовать (0–10)</div><span class="num" style="font-size:20px;">${rec25.value?.toFixed(2)} → ${rec26.value?.toFixed(2)}</span> ${deltaTag(fmtDelta(rec26.value,rec25.value,2))}</div>
+    <div class="card"><div class="card-title">Общая удовлетворённость (1–5)</div><span class="num" style="font-size:20px;">${s25.value?.toFixed(2)} → ${s26.value?.toFixed(2)}</span> ${deltaTag(fmtDelta(s26.value,s25.value,2))}</div>
+  </div>
+  <div class="grid grid-2" style="margin-bottom:16px;">
+    <div class="card"><div class="card-title">Структура: промоутеры/нейтралы/детракторы</div><div class="chart-box" id="chCmpStruct"></div></div>
+    <div class="card"><div class="card-title">Частота тем в комментариях</div><div id="cmpThemes"></div></div>
+  </div>
+  <div class="card" style="margin-bottom:16px;"><div class="card-title">Изменение оценок по показателям (2026 − 2025)</div>
+    <table class="dt"><thead><tr><th>Показатель</th><th>2025</th><th>2026</th><th>Δ</th></tr></thead><tbody>
+      ${driverDeltas.map(d=>`<tr><td>${escapeHtml(d.label)}</td><td class="num">${d.v25.toFixed(2)} (n=${d.n25})</td><td class="num">${d.v26.toFixed(2)} (n=${d.n26})</td>
+      <td class="num" style="color:${d.delta>0?'var(--green)':d.delta<0?'var(--red)':'var(--ink-soft)'}">${d.delta>0?'+':''}${d.delta}</td></tr>`).join('')}
+    </tbody></table></div>
+  <div class="grid grid-2">
+    <div class="card"><div class="card-title">Наибольший рост</div>${driverDeltas.slice(0,3).map(d=>`<div class="small-muted">${escapeHtml(d.label)}: <b class="num" style="color:var(--green)">+${d.delta}</b></div>`).join('')||'<span class="small-muted">нет данных</span>'}</div>
+    <div class="card"><div class="card-title">Наибольшее снижение</div>${driverDeltas.slice(-3).reverse().map(d=>`<div class="small-muted">${escapeHtml(d.label)}: <b class="num" style="color:var(--red)">${d.delta}</b></div>`).join('')||'<span class="small-muted">нет данных</span>'}</div>
+  </div>`;
+  safeDraw('chCmpStruct', el=>stackedBarChart(el, {labels:['2025','2026'], series:[
+    {label:'Промоутеры',color:'#1E9D63',values:[n25.promoters,n26.promoters]},
+    {label:'Нейтралы',color:'#B9820E',values:[n25.passives,n26.passives]},
+    {label:'Детракторы',color:'#D2445A',values:[n25.detractors,n26.detractors]}]}));
+  safeDraw('cmpThemes', el=>{ el.innerHTML = allThemes.map(t=>{ const a=th25[t]||0,b=th26[t]||0,d=b-a;
+    return `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;"><span>${escapeHtml(t)}</span><span class="num">${a} → ${b} <span style="color:${d>0?'var(--green)':d<0?'var(--red)':'var(--ink-soft)'}">(${d>0?'+':''}${d})</span></span></div>`; }).join(''); });
+}
+
+/* ---- 11.7 ЦИФРОВОЙ ПРОФИЛЬ (карточка клиента) ---- */
+function renderProfile(){
+  const ids = Array.from(new Set(RAW_DATA.map(r=>r.id))).sort((a,b)=>a-b);
+  if(!appState.selectedClientId) appState.selectedClientId = ids[0];
+  const id = appState.selectedClientId;
+  const clientRows = RAW_DATA.filter(r=>r.id===id).sort((a,b)=>a.year-b.year);
+  if(clientRows.length===0){ document.getElementById('main-content').innerHTML = `<div class="empty-state"><h4>Клиент не найден</h4><p>ID ${escapeHtml(String(id))} отсутствует в выгрузке.</p></div>`; return; }
+  const last = clientRows[clientRows.length-1], seg = npsSegmentOf(last.nps);
+
+  document.getElementById('main-content').innerHTML = `
+  <h2 class="section-title">Цифровой профиль клиента</h2>
+  <div class="table-toolbar">
+    <select id="clientPicker" data-action="profile-pick">${ids.map(i=>`<option value="${i}" ${i===id?'selected':''}>ID ${i}</option>`).join('')}</select>
+    <input type="text" id="clientSearchBox" data-action="profile-search-key" placeholder="Найти по ID (Enter)">
+  </div>
+  <div class="card" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:14px;">
+    <div>
+      <h3 style="font-size:16px;">${(last.industry&&last.industry!=='ND')?escapeHtml(last.industry):'Отрасль не классифицирована'}</h3>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+        <span class="tag tag-real">ID ${id}</span><span class="tag tag-real">${escapeHtml(last.country)||'—'}</span>
+        <span class="tag tag-real">Тир ${escapeHtml(last.tier)||'—'}</span><span class="tag tag-real">волны: ${clientRows.map(r=>r.year).join(', ')}</span>
+      </div>
+    </div>
+    <div style="text-align:right;">
+      <span class="num" style="font-size:34px;color:${seg==='promoter'?'var(--green)':seg==='passive'?'var(--yellow)':'var(--red)'}">${isNum(last.nps)?last.nps:'н/д'}</span>
+      <div class="pill pill-${seg||'passive'}">${seg?segRu(seg):'нет NPS-ответа'} · волна ${last.year}</div>
+      ${clientRows.length>1?`<div class="small-muted" style="margin-top:4px;">пред. волна: NPS ${clientRows[clientRows.length-2].nps}</div>`:''}
+    </div>
+  </div>
+  <div class="tabs">${[['overview','Обзор'],['dynamics','Динамика'],['scores','Оценки'],['comments','Комментарии'],['channels','Каналы взаимодействия']]
+    .map(([k,l])=>`<button data-action="profile-tab" data-tab="${k}" class="${appState.profileTab===k?'active':''}">${escapeHtml(l)}</button>`).join('')}</div>
+  <div id="profileTabBody"></div>`;
+  renderProfileTab(clientRows, last);
+}
+function renderProfileTab(clientRows, last){
+  const body = document.getElementById('profileTabBody');
+  const tab = appState.profileTab;
+  try{
+    if(tab==='overview'){
+      const scored = DRIVERS.map(d=>({label:d.label,v:last[d.key]})).filter(d=>isNum(d.v));
+      const sorted = scored.slice().sort((a,b)=>a.v-b.v);
+      const min3=sorted.slice(0,3), max3=sorted.slice(-3).reverse();
+      const comments = DRIVERS.filter(d=>d.commentKey && last[d.commentKey]);
+      body.innerHTML = `
+        <div class="grid grid-2">
+          <div class="card"><div class="card-title">Минимально оценённые параметры</div>${min3.map(m=>`<div class="small-muted">${escapeHtml(m.label)}: <b class="num" style="color:var(--red)">${m.v}</b></div>`).join('')||'<span class="small-muted">нет числовых оценок</span>'}</div>
+          <div class="card"><div class="card-title">Максимально оценённые параметры</div>${max3.map(m=>`<div class="small-muted">${escapeHtml(m.label)}: <b class="num" style="color:var(--green)">${m.v}</b></div>`).join('')||'<span class="small-muted">нет числовых оценок</span>'}</div>
+        </div>
+        <div class="card" style="margin-top:14px;"><div class="card-title">Реальные комментарии клиента (последняя волна)</div>
+          ${comments.map(d=>`<div class="comment-row"><div class="comment-top"><span class="tag tag-real">${escapeHtml(d.label)}: ${last[d.key]}</span><span class="tag tag-empty">тема (авто): ${escapeHtml(classifyTheme(last[d.commentKey]))}</span></div><div class="comment-text">«${escapeHtml(last[d.commentKey])}»</div></div>`).join('')||'<p class="small-muted">Текстовых комментариев по параметрам за последнюю волну нет.</p>'}
+        </div>
+        <div class="grid grid-2" style="margin-top:14px;">
+          <div class="card" style="border-left:3px solid var(--accent);">
+            <div class="card-title" style="color:var(--accent-dark);">Автоматическое резюме</div>
+            <p style="font-size:12.5px;line-height:1.6;">${escapeHtml(buildAutoSummary(clientRows,last))}</p>
+            <p class="small-muted" style="margin-top:8px;">Автоматическое резюме на основе ответов клиента. Не является отдельным фактом или экспертным заключением.</p>
+          </div>
+          <div class="card" style="border-left:3px solid ${riskColor(computeChurnRisk(clientRows,last).level)};">
+            <div class="card-title">Предиктивная оценка риска оттока</div>
+            ${(()=>{ const risk = computeChurnRisk(clientRows,last);
+              return `<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px;">
+                <span class="num" style="font-size:26px;color:${riskColor(risk.level)};">${risk.score}</span>
+                <span class="pill" style="background:${riskColor(risk.level)}22;color:${riskColor(risk.level)};">${risk.level} риск</span>
+              </div>
+              <div class="small-muted" style="margin-bottom:6px;">Прозрачная формула по факту — не «чёрный ящик»:</div>
+              ${risk.reasons.length? risk.reasons.map(r=>`<div class="small-muted">• ${escapeHtml(r.text)} <span class="num" style="color:${r.pts>0?'var(--red)':'var(--green)'}">(${r.pts>0?'+':''}${r.pts})</span></div>`).join('') : '<div class="small-muted">Нет факторов риска по имеющимся данным.</div>'}
+              <p class="small-muted" style="margin-top:8px;">Оценка — эвристический индикатор на основе реальных ответов клиента, а не предсказание с гарантированной точностью.</p>`; })()}
+          </div>
+        </div>`;
+    }
+    if(tab==='dynamics'){
+      if(clientRows.length<2){ body.innerHTML = `<div class="empty-state"><h4>Данные клиента доступны только за один период</h4><p>Для построения динамики требуется повторное участие клиента в исследовании.</p></div>`; return; }
+      const [a,b] = clientRows;
+      body.innerHTML = `<div class="grid grid-2">
+        <div class="card"><div class="card-title">NPS: ${a.year} → ${b.year}</div><div class="chart-box" id="chClientDyn"></div></div>
+        <div class="card"><div class="card-title">Что изменилось</div>
+          <div class="small-muted">NPS: ${a.nps} → ${b.nps} ${deltaTag(fmtDelta(b.nps,a.nps,0))}</div>
+          <div class="small-muted" style="margin-top:6px;">Удовл.: ${isNum(a.sat)?a.sat:'н/д'} → ${isNum(b.sat)?b.sat:'н/д'} ${isNum(a.sat)&&isNum(b.sat)?deltaTag(fmtDelta(b.sat,a.sat,0)):''}</div>
+          <div style="margin-top:10px;"><div class="comment-text">«${escapeHtml(a.npsComment)||'—'}»</div><div style="text-align:center;color:var(--ink-faint);">↓</div><div class="comment-text">«${escapeHtml(b.npsComment)||'—'}»</div></div>
+        </div></div>`;
+      safeDraw('chClientDyn', el=>lineChart(el, {labels:[String(a.year),String(b.year)], values:[a.nps,b.nps], yMin:0, yMax:10, pointColors:[colorForNps(a.nps),colorForNps(b.nps)]}));
+    }
+    if(tab==='scores'){
+      const rowsHtml = DRIVERS.map(d=>{
+        const rA = clientRows.find(r=>r.year===2025), rB = clientRows.find(r=>r.year===2026);
+        const v25=rA?rA[d.key]:undefined, v26=rB?rB[d.key]:undefined;
+        if(v25===undefined && v26===undefined) return '';
+        const c25=rA?rA[d.commentKey]:undefined, c26=rB?rB[d.commentKey]:undefined;
+        const delta = isNum(v25)&&isNum(v26)?v26-v25:null;
+        return `<tr><td>${escapeHtml(d.label)}</td><td class="num">${valOrNd(v25)}</td><td class="num">${valOrNd(v26)}</td>
+          <td class="num" style="color:${delta>0?'var(--green)':delta<0?'var(--red)':'var(--ink-soft)'}">${delta===null?'—':(delta>0?'+':'')+delta}</td>
+          <td class="small-muted">${escapeHtml(c25)||'—'}</td><td class="small-muted">${escapeHtml(c26)||'—'}</td></tr>`;
+      }).join('');
+      body.innerHTML = `<div class="card" style="padding:0;"><table class="dt"><thead><tr><th>Параметр</th><th>2025</th><th>2026</th><th>Δ</th><th>Коммент. 2025</th><th>Коммент. 2026</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>`;
+    }
+    if(tab==='comments'){
+      const feed = buildCommentsFeed(clientRows);
+      body.innerHTML = `<div class="card">${feed.length?feed.map(c=>`
+        <div class="comment-row"><div class="comment-top"><span class="comment-meta">${c.year_}</span><span class="tag tag-real">${escapeHtml(c.metric)}${isNum(c.score)?': '+c.score:''}</span>
+        <span class="tag tag-empty">тема (авто): ${escapeHtml(c.theme)}</span><span class="kpi-delta ${c.tone.cls}">тональность (алгоритм.): ${escapeHtml(c.tone.label)}</span></div>
+        <div class="comment-text">«${escapeHtml(c.text)}»</div></div>`).join(''):'<p class="small-muted">Комментариев по этому клиенту в выгрузке нет.</p>'}</div>`;
+    }
+    if(tab==='channels'){
+      body.innerHTML = `<div class="grid grid-3">
+        <div class="card"><div class="card-title">Опросы (NPS)</div><div class="card-sub">${clientRows.length} волн(а/ы) в выгрузке</div>
+          ${clientRows.map(r=>`<div class="comment-row"><div class="comment-top"><span class="comment-meta">волна ${r.year}</span><span class="pill pill-${npsSegmentOf(r.nps)||'passive'}">${r.nps}</span></div><div class="comment-text">«${escapeHtml(r.npsComment)||'—'}»</div></div>`).join('')}
+        </div>
+        ${channelEmpty('Письма в поддержку')}${channelEmpty('Контакт-центр (обращения)')}${channelEmpty('Звонки')}
+        ${channelEmpty('Техническая поддержка (события)')}${channelEmpty('Глубинные исследования')}${channelEmpty('Заказы и поставки')}
+        ${channelEmpty('CRM')}${channelEmpty('Внешние отзывы')}
+      </div>`;
+    }
+  }catch(e){
+    body.innerHTML = `<div class="empty-state"><h4>Не удалось отобразить вкладку</h4><p>${escapeHtml(e.message)}</p></div>`;
+    console.error('[spectra] profile tab error', e);
+  }
+}
+function valOrNd(v){ return isNum(v) ? v : (v ? escapeHtml(String(v)) : 'Нет данных'); }
+function colorForNps(v){ return isNum(v) ? (v>=9?'#1E9D63':v>=7?'#B9820E':'#D2445A') : '#6C8A91'; }
+function riskColor(level){ return level==='высокий' ? 'var(--red)' : (level==='средний' ? 'var(--yellow)' : 'var(--green)'); }
+function channelEmpty(name){ return `<div class="card empty-state"><h4>${escapeHtml(name)}</h4><p>Источник не подключён. В предоставленном наборе данных события этого типа отсутствуют.</p><button class="btn-disabled" disabled>Подключить источник</button></div>`; }
+
+/* ---- 11.8 ИСТОЧНИКИ ДАННЫХ ---- */
+function renderSources(){
+  const cols25 = Object.keys(RAW_DATA.find(r=>r.year===2025));
+  const cols26 = Object.keys(RAW_DATA.find(r=>r.year===2026));
+  const fillRate = y=>{ const rows=getYearRows(y); let filled=0,total=0; DRIVERS.forEach(d=>{ rows.forEach(r=>{ total++; if(isNum(r[d.key])) filled++; }); }); return Math.round(filled/total*1000)/10; };
+  const notConnected = [
+    ['CRM','история сделок, статусы контрактов, ответственные менеджеры'],['Email','переписка с клиентом, тема и статус обращений'],
+    ['Контакт-центр','обращения, темы звонков, время ожидания'],['Телефония','записи и метаданные звонков'],
+    ['Тикет-система (Helpdesk)','заявки, SLA, статус решения'],['ERP','заказы, объёмы, счета, статус отгрузки'],
+    ['Система заказов','фактическая история заказов клиента'],['Технический сервис (событийный)','история обращений и работ, а не только опросная оценка'],
+    ['Глубинные исследования (CustDev)','качественные инсайты интервью'],['Геосервисы','геопривязка точек поставки и логистики'],
+    ['Внешние отзывы','упоминания и отзывы клиента во внешних источниках'],
+  ];
+  document.getElementById('main-content').innerHTML = `
+  <h2 class="section-title">Источники данных</h2>
+  <h3 style="font-size:13px;margin-bottom:10px;">Подключено</h3>
+  <div class="grid grid-2" style="margin-bottom:20px;">
+    <div class="card"><div class="card-title">Excel: исследование 2025</div>
+      <div class="small-muted">строк: <b class="num">${getYearRows(2025).length}</b></div>
+      <div class="small-muted">колонок в исходном листе: <b class="num">${cols25.length}</b></div>
+      <div class="small-muted">уникальных ID: <b class="num">${new Set(getYearRows(2025).map(r=>r.id)).size}</b></div>
+      <div class="small-muted">заполненность числовых оценок: <b class="num">${fillRate(2025)}%</b></div>
+      <div class="small-muted">дата импорта: <span class="tag tag-empty">не зафиксирована в источнике</span></div>
+      <span class="tag tag-real" style="margin-top:8px;display:inline-block;">подключено</span></div>
+    <div class="card"><div class="card-title">Excel: исследование 2026</div>
+      <div class="small-muted">строк: <b class="num">${getYearRows(2026).length}</b></div>
+      <div class="small-muted">колонок в исходном листе: <b class="num">${cols26.length}</b></div>
+      <div class="small-muted">уникальных ID: <b class="num">${new Set(getYearRows(2026).map(r=>r.id)).size}</b></div>
+      <div class="small-muted">заполненность числовых оценок: <b class="num">${fillRate(2026)}%</b></div>
+      <div class="small-muted">дата импорта: <span class="tag tag-empty">не зафиксирована в источнике</span></div>
+      <span class="tag tag-real" style="margin-top:8px;display:inline-block;">подключено</span></div>
+  </div>
+  <div class="card" style="margin-bottom:20px;"><div class="card-title">Найденные различия схемы 2025 vs 2026</div>
+    <div class="small-muted" style="margin-top:6px;">Вопросы «Оформление документов» и «Качество упаковки» были в анкете 2025 года и убраны из анкеты 2026 года.</div>
+    <div class="small-muted" style="margin-top:6px;">В анкете 2026 года добавлен новый блок причин необращения в технический сервис (4 варианта) — в 2025 году такого вопроса не было.</div>
+  </div>
+  <h3 style="font-size:13px;margin-bottom:10px;">Не подключено</h3>
+  <div class="grid grid-3">${notConnected.map(([name,desc])=>`<div class="card empty-state"><h4>${escapeHtml(name)}</h4><p>Статус: не подключён. После подключения добавит в профиль: ${escapeHtml(desc)}.</p><button class="btn-disabled" disabled>Подключить</button></div>`).join('')}</div>
+  `;
+}
+/* ---- 11.9 БУДУЩИЕ ВОЗМОЖНОСТИ ---- */
+/* -------------------------------------------------------------------------
+   Иллюстративные эскизы для раздela «Будущие возможности». Это концепт-
+   мокапы того, как МОГ БЫ выглядеть будущий блок — без единой цифры,
+   подписи оси или примера события, чтобы их нельзя было спутать с реальной
+   аналитикой. Все — приглушённых нейтральных тонов, а не фирменного синего,
+   которым в остальном приложении помечены настоящие данные.
+   ------------------------------------------------------------------------- */
+function mockSvg(inner){ return `<svg viewBox="0 0 260 72" width="100%" height="72" preserveAspectRatio="xMinYMid meet">${inner}</svg>`; }
+function mockTimeline(){
+  let s=''; const y=36;
+  s += `<line x1="14" y1="${y}" x2="246" y2="${y}" stroke="#B7D8DE" stroke-width="2" stroke-dasharray="1,5"/>`;
+  [30,90,150,210].forEach((x,i)=>{ s+=`<circle cx="${x}" cy="${y}" r="5" fill="#E7F3F5" stroke="#6C8A91" stroke-width="1.5"/>`;
+    s+=`<rect x="${x-14}" y="${i%2?y+12:y-26}" width="28" height="10" rx="2" fill="#E7F3F5" stroke="#B7D8DE"/>`; });
+  return mockSvg(s);
+}
+function mockMerge(){
+  let s='';
+  [[60,20],[60,52],[30,36]].forEach(([cx,cy])=>{ s+=`<circle cx="${cx}" cy="${cy}" r="10" fill="none" stroke="#B7D8DE" stroke-width="2" stroke-dasharray="2,3"/>`; });
+  s += `<circle cx="170" cy="36" r="16" fill="#E7F3F5" stroke="#6C8A91" stroke-width="2"/>`;
+  [[70,26,155,32],[70,46,155,40],[46,36,153,36]].forEach(([x1,y1,x2,y2])=>{ s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#B7D8DE" stroke-width="1.5" stroke-dasharray="2,3"/>`; });
+  s += `<text x="215" y="40" font-size="9" fill="#6C8A91">ID</text>`;
+  return mockSvg(s);
+}
+function mockPlug(){
+  let s='';
+  s += `<rect x="12" y="20" width="70" height="32" rx="6" fill="#E7F3F5" stroke="#B7D8DE" stroke-width="1.5"/>`;
+  s += `<rect x="178" y="20" width="70" height="32" rx="6" fill="#E7F3F5" stroke="#B7D8DE" stroke-width="1.5"/>`;
+  s += `<line x1="82" y1="36" x2="178" y2="36" stroke="#B7D8DE" stroke-width="2" stroke-dasharray="2,4"/>`;
+  s += `<circle cx="130" cy="36" r="7" fill="#fff" stroke="#6C8A91" stroke-width="2"/>`;
+  return mockSvg(s);
+}
+function mockKanban(){
+  let s='';
+  [10,96,182].forEach((cx,ci)=>{ s+=`<rect x="${cx}" y="10" width="68" height="52" rx="5" fill="#E7F3F5" stroke="#D5E6E9"/>`;
+    [0,1,2].slice(0, ci===2?1:2).forEach((r,i)=>{ s+=`<rect x="${cx+7}" y="${20+i*18}" width="${54-i*8}" height="10" rx="2" fill="#fff" stroke="#B7D8DE"/>`; }); });
+  return mockSvg(s);
+}
+function mockDoc(){
+  let s='';
+  s += `<rect x="20" y="8" width="120" height="56" rx="4" fill="#fff" stroke="#B7D8DE" stroke-width="1.5"/>`;
+  [16,26,36,46].forEach((y,i)=>{ s+=`<rect x="30" y="${y}" width="${i===3?60:100}" height="5" rx="2" fill="#E7F3F5"/>`; });
+  s += `<text x="165" y="42" font-size="26" fill="#D5E6E9" font-family="Georgia,serif">"</text>`;
+  return mockSvg(s);
+}
+function mockForecast(){
+  let s='';
+  s += `<path d="M 14 50 L 60 40 L 100 44 L 140 26" fill="none" stroke="#6C8A91" stroke-width="2"/>`;
+  s += `<path d="M 140 26 L 180 16 L 230 10" fill="none" stroke="#B7D8DE" stroke-width="2" stroke-dasharray="4,4"/>`;
+  s += `<circle cx="230" cy="10" r="6" fill="#fff" stroke="#B7D8DE" stroke-width="2"/><text x="226" y="14" font-size="8" fill="#6C8A91">?</text>`;
+  return mockSvg(s);
+}
+function mockChat(){
+  let s=''; const widths=[120,90,140];
+  widths.forEach((w,i)=>{ s+=`<rect x="${i%2?110:16}" y="${10+i*20}" width="${w}" height="14" rx="7" fill="#E7F3F5" stroke="#B7D8DE"/>`; });
+  return mockSvg(s);
+}
+function mockFlow(){
+  let s='';
+  [20,110,200].forEach((x,i)=>{ s+=`<rect x="${x}" y="26" width="40" height="20" rx="4" fill="#E7F3F5" stroke="#B7D8DE"/>`;
+    if(i<2) s+=`<line x1="${x+40}" y1="36" x2="${x+70}" y2="36" stroke="#B7D8DE" stroke-width="1.5" marker-end="url(#mockArrow)"/>`; });
+  return mockSvg(`<defs><marker id="mockArrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#B7D8DE"/></marker></defs>${s}`);
+}
+const FUTURE_MOCKS = {
+  'Единая хронология контактов': mockTimeline,
+  'Склейка идентификаторов клиента': mockMerge,
+  'Интеграция CRM': mockPlug,
+  'Интеграция email': mockPlug,
+  'Интеграция контакт-центра': mockPlug,
+  'Closed Loop и тикеты': mockKanban,
+  'Анализ глубинных исследований': mockDoc,
+  'Прогноз NPS': mockForecast,
+  'Прогноз оттока': mockForecast,
+  'AI-рекомендации': mockChat,
+  'Автоматические сценарии реагирования': mockFlow,
+};
+function renderFuture(){
+  const items = ['Единая хронология контактов','Склейка идентификаторов клиента','Интеграция CRM','Интеграция email',
+    'Интеграция контакт-центра','Closed Loop и тикеты','Анализ глубинных исследований','Прогноз NPS','Прогноз оттока','AI-рекомендации','Автоматические сценарии реагирования'];
+  document.getElementById('main-content').innerHTML = `
+  <h2 class="section-title">Будущие возможности платформы</h2>
+  <p class="small-muted" style="margin-bottom:16px;max-width:70ch;">Целевая архитектура продукта. Ниже — направления развития и иллюстративные эскизы того, как мог бы выглядеть интерфейс, а не фактическая аналитика: в эскизах намеренно нет ни одной цифры, подписи оси или примера реального события, чтобы не спутать план с данными пилота.</p>
+  <div class="grid grid-3">${items.map(i=>`<div class="card">
+    <div class="card-title">${escapeHtml(i)}</div>
+    <div class="mock-frame">${FUTURE_MOCKS[i] ? FUTURE_MOCKS[i]() : ''}</div>
+    <span class="tag tag-mock">эскиз — не реальные данные</span>
+    <div><span class="tag tag-empty" style="margin-top:8px;">Будущая возможность — данных для демонстрации нет</span></div>
+  </div>`).join('')}</div>
+  `;
+}
+
+/* =========================================================================
+   СЕКЦИЯ 12. ОБРАБОТЧИКИ СОБЫТИЙ (делегирование)
+   Все обработчики регистрируются один раз на статичных контейнерах
+   (document.body) и определяют нужное действие по data-action, а не
+   перевешиваются заново при каждом рендере — это дешевле и не плодит
+   утечки слушателей на больших таблицах.
+   ========================================================================= */
+function gotoClient(id){ appState.selectedClientId = Number(id); appState.screen='profile'; appState.profileTab='overview'; persistState(); render(); }
+
+function handleClick(e){
+  const el = e.target.closest('[data-action]');
+  if(!el) return;
+  const action = el.dataset.action;
+  switch(action){
+    case 'nav': appState.screen = el.dataset.screen; persistState(); render(); break;
+    case 'modal-close': closeModal(); break;
+    case 'reset-filters':
+      appState.country='all'; appState.industry='all'; appState.tier='all'; appState.npsSegment='all'; appState.search='';
+      appState.clientsPage=0; appState.commentsPage=0;
+      persistState(); syncTopbarControls(); renderScreen(); showToast('Фильтры сброшены'); break;
+    case 'drill': {
+      const rows = getFilteredRows(); const k = el.dataset.drill;
+      if(k==='nps') drillToRows('Строки, вошедшие в расчёт NPS', rows.filter(r=>isNum(r.nps)));
+      if(k==='promoter') drillToRows('Промоутеры', rows.filter(r=>npsSegmentOf(r.nps)==='promoter'));
+      if(k==='passive') drillToRows('Нейтралы', rows.filter(r=>npsSegmentOf(r.nps)==='passive'));
+      if(k==='detractor') drillToRows('Детракторы', rows.filter(r=>npsSegmentOf(r.nps)==='detractor'));
+      break;
+    }
+    case 'goto-client': gotoClient(el.dataset.client); break;
+    case 'clients-mode': appState.clientsMode = el.dataset.mode; appState.clientsPage=0; renderScreen(); break;
+    case 'clients-preset': appState.clientsPreset = el.dataset.preset; appState.clientsPage=0; renderScreen(); break;
+    case 'clients-sort': {
+      const k = el.dataset.sort;
+      appState.clientsSort = { key:k, dir: appState.clientsSort.key===k && appState.clientsSort.dir==='desc' ? 'asc':'desc' };
+      renderScreen(); break;
+    }
+    case 'clients-page': {
+      appState.clientsPage += (el.dataset.dir==='next'?1:-1); renderScreen(); break;
+    }
+    case 'comments-page': {
+      appState.commentsPage += (el.dataset.dir==='next'?1:-1); renderScreen(); break;
+    }
+    case 'export-clients': {
+      let rows = getFilteredRows();
+      if(appState.clientsMode==='unique') rows = uniqueClientRows(rows);
+      rows = sortRows(applyClientsPreset(rows), appState.clientsSort.key, appState.clientsSort.dir, true);
+      exportCSV('spectra_clients.csv', rows, [
+        {label:'ID', value:r=>r.id},{label:'Год', value:r=>r.year},{label:'Страна', value:r=>r.country},
+        {label:'Тир', value:r=>r.tier},{label:'Отрасль', value:r=>r.industry},{label:'Удовлетворённость', value:r=>r.sat},
+        {label:'NPS', value:r=>r.nps},{label:'Сегмент', value:r=>segRu(npsSegmentOf(r.nps))}]);
+      break;
+    }
+    case 'export-comments': {
+      let feed = buildCommentsFeed(getFilteredRows());
+      if(appState.commentsSearch) feed = feed.filter(c=>c.text.toLowerCase().includes(appState.commentsSearch.toLowerCase()));
+      if(appState.commentsTheme!=='all') feed = feed.filter(c=>c.theme===appState.commentsTheme);
+      exportCSV('spectra_comments.csv', feed, [
+        {label:'ID', value:c=>c.id},{label:'Год', value:c=>c.year_},{label:'Страна', value:c=>c.country},
+        {label:'Показатель', value:c=>c.metric},{label:'Оценка', value:c=>c.score},{label:'NPS', value:c=>c.nps},
+        {label:'Тема (авто)', value:c=>c.theme},{label:'Текст', value:c=>c.text}]);
+      break;
+    }
+    case 'comparison-mode': appState.comparisonMode = el.dataset.mode; renderScreen(); break;
+    case 'profile-tab': appState.profileTab = el.dataset.tab; {
+      const clientRows = RAW_DATA.filter(r=>r.id===appState.selectedClientId).sort((a,b)=>a.year-b.year);
+      document.querySelectorAll('.tabs button[data-action="profile-tab"]').forEach(b=>b.classList.toggle('active', b.dataset.tab===appState.profileTab));
+      renderProfileTab(clientRows, clientRows[clientRows.length-1]);
+      break;
+    }
+  }
+}
+function handleChange(e){
+  const el = e.target;
+  const action = el.dataset ? el.dataset.action : null;
+  if(!action) return;
+  switch(action){
+    case 'filter-period': appState.period = el.value; persistState(); renderScreen(); break;
+    case 'filter-country': appState.country = el.value; appState.clientsPage=0; persistState(); renderScreen(); break;
+    case 'filter-industry': appState.industry = el.value; appState.clientsPage=0; persistState(); renderScreen(); break;
+    case 'filter-tier': appState.tier = el.value; appState.clientsPage=0; persistState(); renderScreen(); break;
+    case 'filter-nps': appState.npsSegment = el.value; appState.clientsPage=0; persistState(); renderScreen(); break;
+    case 'ov-hist-pick': appState.driverPickHist = el.value; safeDraw('chOvHist', node=>{ const dist=distribution(getFilteredRows(), appState.driverPickHist, 1, 5); barChart(node, {labels:Object.keys(dist), values:Object.values(dist), yMin:0, yMax:Math.max(1,...Object.values(dist)), colors:Object.keys(dist).map(()=>'#1D6E85')}); }); break;
+    case 'comments-theme': appState.commentsTheme = el.value; appState.commentsPage=0; renderScreen(); break;
+    case 'comments-sort': appState.commentsSort = {key:el.value, dir:'desc'}; renderScreen(); break;
+    case 'profile-pick': gotoClient(el.value); break;
+  }
+}
+const handleGlobalSearchInput = debounce(function(el){ appState.search = el.value; appState.clientsPage=0; appState.commentsPage=0; renderScreen(); }, 250);
+const handleCommentsSearchInput = debounce(function(el){ appState.commentsSearch = el.value; appState.commentsPage=0; renderScreen(); }, 250);
+function handleInput(e){
+  const el = e.target;
+  const action = el.dataset ? el.dataset.action : null;
+  if(action==='global-search') handleGlobalSearchInput(el);
+  if(action==='comments-search') handleCommentsSearchInput(el);
+}
+function handleKeydown(e){
+  const el = e.target;
+  if(el && el.dataset && el.dataset.action==='profile-search-key' && e.key==='Enter'){
+    const v = Number(el.value);
+    if(RAW_DATA.some(r=>r.id===v)) gotoClient(v); else showToast('ID не найден в выгрузке', true);
+  }
+}
+
+/* Глобальная защита: ошибка в любом месте приложения не должна "убивать" интерфейс. */
+window.addEventListener('error', function(e){
+  console.error('[spectra] uncaught error', e.error||e.message);
+  showToast('Произошла внутренняя ошибка интерфейса. Навигация продолжает работать.', true);
+});
+window.addEventListener('unhandledrejection', function(e){
+  console.error('[spectra] unhandled promise rejection', e.reason);
+});
+
+/* =========================================================================
+   ИНИЦИАЛИЗАЦИЯ
+   ========================================================================= */
+function initApp(){
+  loadPersistedState();
+  buildShellOnce();
+  document.body.addEventListener('click', handleClick);
+  document.body.addEventListener('change', handleChange);
+  document.body.addEventListener('input', handleInput);
+  document.body.addEventListener('keydown', handleKeydown);
+  document.getElementById('modalOverlay').addEventListener('click', function(e){ if(e.target.id==='modalOverlay') closeModal(); });
+  render();
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', initApp); else initApp();
+</script>
+</body>
+</html>
